@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'starlight-purple': '#a855f7',
+                        'starlight-gold': '#fde047',
+                        'starlight-dark': '#4a148c',
+                    },
+                    fontFamily: {
+                        'shenxinghui': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-starlight {
+                background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #4a148c 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+            }
+            .border-glow {
+                box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+            }
+            .input-focus {
+                @apply focus:border-starlight-purple focus:ring-2 focus:ring-starlight-purple/30 transition-all duration-300;
+            }
+        }
+    </style>
+    <style>
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: shine 2s infinite ease-in-out;
+        }
+        @keyframes shine {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
+        }
+        .planet-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        .planet {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #7c3aed, #4a148c);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+            animation: rotate 20s linear infinite;
+        }
+        .planet-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140%;
+            height: 140%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(15deg);
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-starlight min-h-screen flex items-center justify-center overflow-hidden relative">
+    <!-- 背景星星 -->
+    <div id="stars"></div>
+
+    <!-- 主容器 -->
+    <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center">
+        <!-- 标题 -->
+        <div class="text-center mb-12 float-animation">
+            <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white text-shadow mb-2">STAR</h1>
+            <p class="text-[clamp(1rem,2vw,1.5rem)] text-white/80">小王妃请进入</p>
+        </div>
+
+        <!-- 登录卡片 -->
+        <div class="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20 border-glow shadow-2xl">
+            <div class="text-center mb-8">
+                <!-- 蓝紫色梦幻星球 -->
+                <div class="planet-container">
+                    <div class="planet"></div>
+                    <div class="planet-ring"></div>
+                </div>
+                <h2 class="text-2xl font-semibold text-white mt-4">乌鲁鲁星</h2>
+                <p class="text-starlight-purple/80 text-sm mt-1">总会存在希望的小星球</p>
+            </div>
+
+            <!-- 登录表单 -->
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label for="phone" class="block text-white/80 text-sm font-medium mb-2">ID</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-phone text-starlight-purple"></i>
+                        </div>
+                        <input id="phone" name="phone" type="tel" placeholder="请输入您的星际坐标ID" required class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 input-focus">
+                    </div>
+                    <p class="text-white/60 text-xs mt-1">推荐使用星际坐标锚定</p>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-white/80 text-sm font-medium mb-2">宇宙身份认证</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-lock text-starlight-purple"></i>
+                        </div>
+                        <input id="password" name="password" type="password" placeholder="请输入您的宇宙编号" required class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 input-focus">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-starlight-purple focus:ring-starlight-purple border-white/30 rounded">
+                        <label for="remember-me" class="ml-2 block text-white/70 text-sm">记住我</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-starlight-purple hover:bg-starlight-purple/90 text-white font-medium py-3 px-4 rounded-lg btn-hover">
+                    接受他的邀请
+                </button>
+            </form>
+
+            <!-- 其他登录选项 -->
+            <div class="mt-8">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-white/20"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white/5 text-white/60">其他登录方式</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-center mt-6 space-x-4">
+                    <a href="#" class="text-white/70 hover:text-starlight-purple transition-colors">
+                        <i class="fa fa-weixin text-xl"></i>
+                    </a>
+                    <a href="#" class="text-white/70 hover:text-starlight-purple transition-colors">
+                        <i class="fa fa-qq text-xl"></i>
+                    </a>
+                    <a href="#" class="text-white/70 hover:text-starlight-purple transition-colors">
+                        <i class="fa fa-weibo text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 注册链接 -->
+            <div class="mt-6 text-center">
+                <p class="text-white/60 text-sm">
+                    还没有账号? <a href="#" class="font-medium text-starlight-purple hover:text-starlight-gold transition-colors">立即注册</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="mt-12 text-center">
+            <p class="text-white/40 text-sm">© 2025 STAR · 沈星回主题站</p>
+        </div>
+    </div>
+
+    <script>
+        // 生成背景星星
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const count = 100;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 随机大小
+                const size = Math.random() * 3 + 1;
+                
+                // 随机延迟
+                const delay = Math.random() * 5;
+                
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 表单提交处理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取用户输入
+            const username = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            
+            // 简单验证（实际项目中应该有更完善的验证）
+            if (username && password) {
+                // 显示提示信息
+                alert('星际信号稳定！即将进入您与沈星回的专属世界...');
+                
+                // 使用您指定的相对路径
+                window.location.href = "主页.html";
+            } else {
+                alert('请输入完整的ID和宇宙编号');
+            }
+        });
+        
+        // 页面加载完成后执行
+        window.addEventListener('DOMContentLoaded', () => {
+            createStars();
+        });
+    </script>
+</body>
+</html>

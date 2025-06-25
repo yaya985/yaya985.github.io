@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沈星回的天文台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-space': '#0B0E2D',
+                        'starry-purple': '#5D3FD3',
+                        'cosmic-silver': '#C0C0C0',
+                        'nebula-blue': '#1E3A8A',
+                        'galactic-pink': '#FF6EC7',
+                        'comet-green': '#00FFAA'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .twinkle {
+                animation: twinkle 3s infinite ease-in-out;
+            }
+            .constellation-line {
+                stroke-dasharray: 1000;
+                stroke-dashoffset: 1000;
+                animation: dash 2s linear forwards;
+            }
+            .shooting-star {
+                position: absolute;
+                transform-origin: 0 50%;
+                opacity: 0;
+            }
+            .nav-link {
+                position: relative;
+            }
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -4px;
+                left: 0;
+                background-color: theme('colors.starry-purple');
+                transition: width 0.3s ease;
+            }
+            .nav-link:hover::after {
+                width: 100%;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .starship-btn {
+                background: linear-gradient(135deg, #5D3FD3 0%, #FF6EC7 100%);
+                transition: all 0.3s ease;
+            }
+            .starship-btn:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(93, 63, 211, 0.5), 0 8px 10px -6px rgba(255, 110, 199, 0.4);
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes shooting {
+            0% {
+                transform: scale(0.1) rotate(var(--angle)) translateX(0);
+                opacity: 0;
+            }
+            20% {
+                transform: scale(0.5) rotate(var(--angle)) translateX(calc(var(--distance) * 0.2));
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(var(--angle)) translateX(var(--distance));
+                opacity: 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-deep-space text-white font-inter min-h-screen flex flex-col">
+    <!-- 星空背景 -->
+    <div class="fixed inset-0 -z-10">
+        <div id="stars" class="absolute inset-0"></div>
+        <div id="nebula" class="absolute inset-0 bg-gradient-to-b from-starry-purple/20 to-deep-space/90"></div>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md bg-deep-space/80 border-b border-starry-purple/30">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa fa-telescope text-starry-purple"></i>
+                    <span>沈星回的天文台</span>
+                </a>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#observatory" class="nav-link text-cosmic-silver hover:text-white transition-colors">星空观测台</a>
+                    <a href="#starship-cruise" class="nav-link text-cosmic-silver hover:text-white transition-colors">星舰巡航</a>
+                    <a href="#meteor-shower" class="nav-link text-cosmic-silver hover:text-white transition-colors">流星雨模拟器</a>
+                    <a href="主页.html" class="nav-link text-cosmic-silver hover:text-white transition-colors flex items-center">
+                        <i class="fa fa-home mr-1"></i> 回主页
+                    </a>
+                </div>
+                <button class="md:hidden text-white text-xl">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+        <div class="container mx-auto px-4 py-16 text-center">
+            <h1 class="text-[clamp(2.5rem,8vw,5rem)] font-bold mb-6 tracking-tighter leading-tight">
+                <span class="text-white">探索</span>
+                <span class="text-starry-purple">星空奥秘</span>
+            </h1>
+            <p class="text-[clamp(1rem,3vw,1.5rem)] text-cosmic-silver max-w-3xl mx-auto mb-10">
+                欢迎来到沈星回的虚拟天文台，在这里你可以探索星座、观看流星雨，感受星空的无限魅力。
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#observatory" class="px-8 py-3 bg-starry-purple hover:bg-starry-purple/90 text-white rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-starry-purple/20">
+                    探索星座
+                </a>
+                <a href="#starship-cruise" class="px-8 py-3 bg-transparent border-2 border-cosmic-silver hover:border-starry-purple text-white rounded-full transition-all duration-300 transform hover:scale-105">
+                    星舰巡航
+                </a>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#observatory" class="text-cosmic-silver hover:text-starry-purple transition-colors">
+                <i class="fa fa-angle-down text-3xl"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- 星空观测台板块 -->
+    <section id="observatory" class="py-20 bg-gradient-to-b from-deep-space to-nebula-blue/30">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold mb-4">星空观测台</h2>
+                <p class="text-cosmic-silver text-lg max-w-3xl mx-auto">
+                    探索神秘的星座世界，了解每个星座背后的故事。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-12 items-center">
+                <div class="bg-deep-space/70 p-6 rounded-xl backdrop-blur-sm border border-starry-purple/20 shadow-xl card-hover">
+                    <h3 class="text-2xl font-semibold mb-6 text-starry-purple">著名星座介绍</h3>
+                    <div id="constellation-list" class="space-y-6">
+                        <!-- 星座介绍将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 开启星舰巡航板块 -->
+    <section id="starship-cruise" class="py-20 bg-gradient-to-b from-nebula-blue/20 to-deep-space">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold mb-4">开启星舰巡航</h2>
+                <p class="text-cosmic-silver text-lg max-w-3xl mx-auto">
+                    准备好踏上星际旅程，探索更远的宇宙边疆
+                </p>
+            </div>
+
+            <div class="flex flex-col items-center justify-center">
+                <div class="relative w-full max-w-3xl">
+                    <div class="absolute inset-0 bg-[url('https://picsum.photos/id/1016/1200/600')] bg-cover bg-center opacity-20 rounded-2xl"></div>
+                    <div class="relative bg-deep-space/80 p-8 md:p-12 rounded-2xl border border-starry-purple/30 shadow-2xl">
+                        <div class="text-center mb-8">
+                            <i class="fa fa-rocket text-5xl text-starry-purple mb-4"></i>
+                            <h3 class="text-2xl md:text-3xl font-bold mb-4">星际探索任务</h3>
+                            <p class="text-cosmic-silver max-w-2xl mx-auto">
+                                登上我们的虚拟星舰，开启一场穿越星系的冒险。你将飞越星云，掠过行星环，甚至可能发现未知的恒星系统。准备好你的好奇心，宇宙在等待！
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <a href="星舰.html" class="starship-btn px-10 py-4 text-white font-bold rounded-full inline-flex items-center gap-3">
+                                <i class="fa fa-play"></i>
+                                <span>启动星舰引擎</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 流星雨模拟器 -->
+    <section id="meteor-shower" class="py-20 bg-gradient-to-b from-nebula-blue/30 to-deep-space">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.8rem,5vw,3rem)] font-bold mb-4">流星雨模拟器</h2>
+                <p class="text-cosmic-silver text-lg max-w-3xl mx-auto">
+                    体验壮观的流星雨，点击按钮，让流星划过你的屏幕。
+                </p>
+            </div>
+
+            <div class="relative h-[500px] bg-deep-space rounded-xl border border-starry-purple/30 overflow-hidden mb-8">
+                <div id="meteor-canvas" class="absolute inset-0">
+                    <!-- 流星将在这里生成 -->
+                </div>
+                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10">
+                    <button id="start-meteor-shower" class="px-8 py-3 bg-starry-purple hover:bg-starry-purple/90 text-white rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-starry-purple/30 flex items-center gap-2">
+                        <i class="fa fa-magic"></i>
+                        触发流星雨
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-deep-space/70 p-6 rounded-xl backdrop-blur-sm border border-starry-purple/20 shadow-xl card-hover">
+                    <h3 class="text-xl font-semibold mb-4 text-starry-purple flex items-center">
+                        <i class="fa fa-info-circle mr-2"></i>流星雨知识
+                    </h3>
+                    <p class="text-cosmic-silver">
+                        流星雨是由彗星或小行星碎片进入地球大气层时燃烧形成的天文现象。最著名的流星雨包括狮子座流星雨、英仙座流星雨和双子座流星雨。
+                    </p>
+                </div>
+                <div class="bg-deep-space/70 p-6 rounded-xl backdrop-blur-sm border border-starry-purple/20 shadow-xl card-hover">
+                    <h3 class="text-xl font-semibold mb-4 text-starry-purple flex items-center">
+                        <i class="fa fa-calendar mr-2"></i>2025年主要流星雨
+                    </h3>
+                    <ul class="text-cosmic-silver space-y-2">
+                        <li>• 英仙座流星雨 - 8月12日</li>
+                        <li>• 双子座流星雨 - 12月14日</li>
+                        <li>• 象限仪座流星雨 - 1月4日</li>
+                        <li>• 猎户座流星雨 - 10月20日</li>
+                    </ul>
+                </div>
+                <div class="bg-deep-space/70 p-6 rounded-xl backdrop-blur-sm border border-starry-purple/20 shadow-xl card-hover">
+                    <h3 class="text-xl font-semibold mb-4 text-starry-purple flex items-center">
+                        <i class="fa fa-tips mr-2"></i>观测小贴士
+                    </h3>
+                    <p class="text-cosmic-silver">
+                        观测流星雨最好选择远离城市光污染的地方，在新月期间观测效果更佳。记得带上保暖衣物和折叠椅，舒适地等待流星划过夜空。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 简化的页脚 -->
+    <footer class="bg-deep-space border-t border-starry-purple/30 py-6">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-4">
+                <a href="#" class="text-2xl font-bold text-white flex items-center justify-center gap-2">
+                    <i class="fa fa-telescope text-starry-purple"></i>
+                    <span>沈星回的天文台</span>
+                </a>
+            </div>
+            <div class="flex justify-center space-x-4 mb-6">
+                <a href="#" class="text-cosmic-silver hover:text-starry-purple transition-colors">
+                    <i class="fa fa-facebook"></i>
+                </a>
+                <a href="#" class="text-cosmic-silver hover:text-starry-purple transition-colors">
+                    <i class="fa fa-twitter"></i>
+                </a>
+                <a href="#" class="text-cosmic-silver hover:text-starry-purple transition-colors">
+                    <i class="fa fa-instagram"></i>
+                </a>
+                <a href="#" class="text-cosmic-silver hover:text-starry-purple transition-colors">
+                    <i class="fa fa-youtube"></i>
+                </a>
+            </div>
+            <div class="text-cosmic-silver text-sm">
+                <p>© 2025 沈星回的天文台. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 星空背景生成
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const count = 300;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                const size = Math.random() * 3 + 1;
+                const opacity = Math.random() * 0.8 + 0.2;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const animationDelay = Math.random() * 5;
+                
+                star.style.position = 'absolute';
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.background = Math.random() > 0.8 ? 
+                    'linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 45%, rgba(255,255,255,0) 100%)' : 
+                    'white';
+                star.style.borderRadius = '50%';
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.opacity = opacity;
+                star.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.8)';
+                
+                if (Math.random() > 0.7) {
+                    star.classList.add('twinkle');
+                    star.style.animationDelay = `${animationDelay}s`;
+                }
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        const constellations = [
+            {
+                name: "大熊座",
+                description: "大熊座是北天最容易辨认的星座之一，其中最著名的是北斗七星，形状像一个勺子。在古代，人们用北斗七星来导航和确定季节。",
+                points: [
+                    { x: 25, y: 20 },  // 天枢
+                    { x: 35, y: 25 },  // 天璇
+                    { x: 45, y: 25 },  // 天玑
+                    { x: 55, y: 20 },  // 天权
+                    { x: 60, y: 30 },  // 玉衡
+                    { x: 65, y: 40 },  // 开阳
+                    { x: 70, y: 50 }   // 摇光
+                ]
+            },
+            {
+                name: "猎户座",
+                description: "猎户座是冬季夜空中最壮观的星座之一，包含三颗明亮的腰带星和著名的猎户座大星云。在希腊神话中，猎户座代表猎人奥瑞恩。",
+                points: [
+                    { x: 30, y: 20 },  // 参宿四（左肩）
+                    { x: 60, y: 15 },  // 参宿五（右肩）
+                    { x: 25, y: 40 },  // 参宿七（左脚）
+                    { x: 65, y: 45 },  // 参宿三（右脚）
+                    { x: 40, y: 30 },  // 参宿二（左腰带）
+                    { x: 45, y: 30 },  // 参宿中（中腰带）
+                    { x: 50, y: 30 },  // 参宿一（右腰带）
+                    { x: 35, y: 50 },  // 参宿六（左腿）
+                    { x: 55, y: 55 }   // 参宿一（右腿）
+                ]
+            },
+            {
+                name: "天蝎座",
+                description: "天蝎座是夏季夜空中的标志性星座，形状像一只蝎子。其心脏位置是红色超巨星心宿二，亮度仅次于天狼星。",
+                points: [
+                    { x: 30, y: 25 },  // 心宿二（天蝎座α）
+                    { x: 35, y: 30 },  // 房宿四（天蝎座β）
+                    { x: 40, y: 25 },  // 房宿三（天蝎座δ）
+                    { x: 45, y: 35 },  // 房宿二（天蝎座ε）
+                    { x: 50, y: 25 },  // 房宿一（天蝎座ζ）
+                    { x: 55, y: 35 },  // 心宿一（天蝎座σ）
+                    { x: 60, y: 25 },  // 尾宿五（天蝎座λ）
+                    { x: 65, y: 35 },  // 尾宿四（天蝎座μ）
+                    { x: 70, y: 25 },  // 尾宿三（天蝎座ν）
+                    { x: 40, y: 45 },  // 斗宿五（天蝎座λ）
+                    { x: 45, y: 55 },  // 斗宿四（天蝎座φ）
+                    { x: 50, y: 50 },  // 斗宿二（天蝎座τ）
+                    { x: 55, y: 60 },  // 尾宿八（天蝎座υ）
+                    { x: 60, y: 65 },  // 尾宿九（天蝎座χ）
+                    { x: 65, y: 60 }   // 尾宿十（天蝎座ψ）
+                ]
+            },
+            {
+                name: "天鹰座",
+                description: "天鹰座是夏季夜空中的一个显著星座，其中最亮的星是牛郎星（织女星的伴侣），与天琴座的织女星和天鹅座的天津四组成夏季大三角。",
+                points: [
+                    { x: 30, y: 30 },  // 牛郎星（天鹰座α）
+                    { x: 40, y: 35 },  // 天鹰座γ
+                    { x: 50, y: 30 },  // 天鹰座δ
+                    { x: 40, y: 45 },  // 天鹰座ε
+                    { x: 50, y: 55 },  // 天鹰座ζ
+                    { x: 60, y: 45 },  // 天鹰座η
+                    { x: 70, y: 30 }   // 天鹰座β
+                ]
+            },
+            {
+                name: "天琴座",
+                description: "天琴座是北天银河中最灿烂的星座之一，其中最亮的星是织女星，它是夏季大三角的顶点之一，也是夜空中第五亮的星。",
+                points: [
+                    { x: 35, y: 25 },  // 织女星（天琴座α）
+                    { x: 40, y: 35 },  // 天琴座β
+                    { x: 45, y: 30 },  // 天琴座γ
+                    { x: 50, y: 35 },  // 天琴座δ
+                    { x: 55, y: 25 },  // 天琴座ε
+                    { x: 50, y: 15 },  // 天琴座ζ
+                    { x: 45, y: 20 }   // 天琴座η
+                ]
+            },
+            {
+                name: "天鹅座",
+                description: "天鹅座是北天星座之一，其形状像一只展翅飞翔的天鹅，横跨银河。最亮的星是天津四，它是夏季大三角的顶点之一。",
+                points: [
+                    { x: 30, y: 20 },  // 天津四（天鹅座α）
+                    { x: 40, y: 30 },  // 天鹅座β
+                    { x: 50, y: 20 },  // 天鹅座γ
+                    { x: 60, y: 30 },  // 天鹅座δ
+                    { x: 70, y: 20 },  // 天鹅座ε
+                    { x: 60, y: 45 },  // 天鹅座ζ
+                    { x: 50, y: 55 },  // 天鹅座η
+                    { x: 40, y: 45 }   // 天鹅座θ
+                ]
+            }
+        ];
+
+        // 生成随机星座介绍
+        function generateRandomConstellations() {
+            const container = document.getElementById('constellation-list');
+            container.innerHTML = '';
+            
+            // 创建一个副本并打乱顺序
+            const shuffledConstellations = [...constellations].sort(() => 0.5 - Math.random());
+            
+            // 选择前三个星座
+            const selectedConstellations = shuffledConstellations.slice(0, 3);
+            
+            // 生成HTML
+            selectedConstellations.forEach(constellation => {
+                const item = document.createElement('div');
+                item.className = 'flex gap-4 items-center';
+                item.innerHTML = `
+                    <div class="w-16 h-16 rounded-full bg-starry-purple/20 flex items-center justify-center">
+                        <i class="fa fa-star text-starry-purple text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-medium mb-1">${constellation.name}</h4>
+                        <p class="text-sm text-cosmic-silver">${constellation.description}</p>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 流星雨模拟器（光点精确位于线条最前端，近大远小效果更明显）
+        function createMeteorShower() {
+            const canvas = document.getElementById('meteor-canvas');
+            canvas.innerHTML = '';
+            
+            // 创建30个随机流星
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    createMeteor(canvas);
+                }, i * 200);
+            }
+        }
+
+        function createMeteor(container) {
+            // 随机生成流星属性
+            const size = Math.random() * 3 + 1;
+            const length = Math.random() * 150 + 80; // 增加流星长度范围
+            const x = Math.random() * 100;
+            const y = Math.random() * 10; // 流星从更上方开始
+            const angle = Math.random() * 45 + 15; // 流星角度
+            const duration = Math.random() * 0.8 + 1.2; // 流星速度
+            const distance = Math.random() * 200 + 150; // 流星移动距离
+            
+            // 创建流星容器
+            const meteorContainer = document.createElement('div');
+            meteorContainer.className = 'shooting-star';
+            meteorContainer.style.position = 'absolute';
+            meteorContainer.style.left = `${x}%`;
+            meteorContainer.style.top = `${y}%`;
+            meteorContainer.style.transform = `rotate(${angle}deg)`;
+            meteorContainer.style.transformOrigin = '0 50%';
+            meteorContainer.style.opacity = '0';
+            
+            // 创建流星尾部（使用线性渐变实现近大远小效果）
+            const meteorTail = document.createElement('div');
+            meteorTail.style.width = `${length}px`;
+            meteorTail.style.height = `${size * 2}px`; // 增加流星线的基准粗细
+            meteorTail.style.position = 'absolute';
+            meteorTail.style.left = '0';
+            meteorTail.style.top = '50%';
+            meteorTail.style.transform = 'translateY(-50%)';
+            
+            // 使用CSS渐变实现近大远小效果 - 前端更粗，后端更细
+            meteorTail.style.background = `linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,1) 100%)`;
+            
+            // 创建流星头部（精确位于流星线的最前端）
+            const meteorHead = document.createElement('div');
+            const headSize = size * 6; // 增大头部尺寸，增强近大远小对比
+            meteorHead.style.width = `${headSize}px`;
+            meteorHead.style.height = `${headSize}px`;
+            meteorHead.style.borderRadius = '50%';
+            meteorHead.style.background = 'white';
+            meteorHead.style.boxShadow = `0 0 ${headSize}px rgba(255, 255, 255, 0.9), 0 0 ${headSize * 1.5}px rgba(255, 215, 0, 0.7)`; // 增加光晕大小
+            meteorHead.style.position = 'absolute';
+            meteorHead.style.left = `${length}px`; // 位于流星线的最前端
+            meteorHead.style.top = '50%';
+            meteorHead.style.transform = 'translate(-50%, -50%)';
+            
+            // 将尾部和头部添加到容器
+            meteorContainer.appendChild(meteorTail);
+            meteorContainer.appendChild(meteorHead);
+            container.appendChild(meteorContainer);
+            
+            // 设置CSS变量，用于动画
+            meteorContainer.style.setProperty('--angle', `${angle}deg`);
+            meteorContainer.style.setProperty('--distance', `${distance}px`);
+            
+            // 触发动画
+            setTimeout(() => {
+                meteorContainer.style.animation = `shooting ${duration}s forwards`;
+                
+                // 动画结束后移除元素
+                setTimeout(() => {
+                    container.removeChild(meteorContainer);
+                }, duration * 1000);
+            }, 10);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 创建星空背景
+            createStars();
+            
+            // 生成随机星座介绍
+            generateRandomConstellations();
+            
+            // 绑定流星雨按钮
+            document.getElementById('start-meteor-shower').addEventListener('click', createMeteorShower);
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80, // 考虑导航栏高度
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

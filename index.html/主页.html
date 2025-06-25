@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'starlight-purple': '#a855f7',
+                        'starlight-gold': '#fde047',
+                        'starlight-dark': '#4a148c',
+                    },
+                    fontFamily: {
+                        'shenxinghui': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-starlight {
+                background: linear-gradient(135deg, #a855f7 0%, #7c3aed 50%, #4a148c 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 0 10px rgba(168, 85, 247, 0.7);
+            }
+            .border-glow {
+                box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+            }
+            .input-focus {
+                @apply focus:border-starlight-purple focus:ring-2 focus:ring-starlight-purple/30 transition-all duration-300;
+            }
+            .star-animation {
+                animation: float 6s ease-in-out infinite;
+            }
+            .star-pulse {
+                animation: pulse 3s ease-in-out infinite;
+            }
+        }
+    </style>
+    <style>
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
+        }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .star-bg {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: shine 2s infinite ease-in-out;
+        }
+        @keyframes shine {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
+        }
+        .planet-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        .planet {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #7c3aed, #4a148c);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+            animation: rotate 20s linear infinite;
+        }
+        .planet-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140%;
+            height: 140%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(15deg);
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 星语星星样式 */
+        .star-language {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            border-radius: 50%;
+        }
+        .star-language:hover {
+            transform: scale(1.3);
+        }
+        .star-language.active {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px currentColor; }
+            50% { transform: scale(1.2); box-shadow: 0 0 25px currentColor; }
+        }
+        /* 星轨容器 */
+        .orbit-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .orbit {
+            position: absolute;
+            border-radius: 50%;
+            animation: orbit 60s linear infinite;
+        }
+        @keyframes orbit {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-starlight min-h-screen overflow-x-hidden relative">
+    <!-- 背景星星 -->
+    <div id="stars"></div>
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-xl border-b border-white/20">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="planet-container mr-3 w-10 h-10">
+                    <div class="planet"></div>
+                    <div class="planet-ring"></div>
+                </div>
+                <span class="text-white font-bold text-xl">STAR</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="登录.html" class="text-white hover:text-starlight-gold transition-colors">登录页跳转</a>
+            </div>
+            <div class="md:hidden">
+                <button class="text-white focus:outline-none">
+                    <i class="fa fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 头部区域 -->
+        <header class="text-center mb-16">
+            <div class="planet-container mb-6">
+                <div class="planet"></div>
+                <div class="planet-ring"></div>
+            </div>
+            <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white text-shadow mb-4">乌鲁鲁星</h1>
+            <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/80 max-w-2xl mx-auto">深空研究员 · 星轨观测者</p>
+        </header>
+
+        <!-- 每日星语板块 -->
+        <section class="mb-20">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-white text-shadow mb-8 text-center">每日星语 - 他今天想和你说</h2>
+            
+            <div class="relative bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/20 h-[500px] overflow-hidden" id="star-area">
+                <!-- 星轨系统 -->
+                <div class="orbit-container" id="orbit-container"></div>
+                
+                <!-- 星语显示框 -->
+                <div id="language-display" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/30 shadow-xl transition-all duration-300">
+                    <h3 class="text-starlight-dark font-bold text-lg mb-3">星语</h3>
+                    <p id="language-text" class="text-gray-800 text-base leading-relaxed">请点击上方的星星，聆听沈星回的低语...</p>
+                    <div class="flex justify-end mt-4">
+                        <span id="language-signature" class="text-starlight-purple font-medium">—— 沈星回</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 闲暇时光板块 -->
+        <section class="mb-20">
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-white text-shadow mb-8 text-center">闲暇时光 - 与他共度</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 闲暇时光1 -->
+                <div class="memory-card bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                    <div class="relative overflow-hidden rounded-lg mb-4 group">
+                        <!-- 优化后的图片显示 -->
+                        <img src=主页图片\图片1.jpg
+                             class="w-full h-auto object-cover aspect-[4/3] rounded-lg transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">和他一起养宠物</h3>
+                    <p class="text-white/70 text-sm">他总是说小动物像你一样治愈，每次喂兔子时，他眼里的温柔比星光还亮...</p>
+                    <a href="养宠游戏.html" class="mt-4 text-starlight-gold hover:text-white transition-colors flex items-center">
+                        <span>遛养喂食</span>
+                        <i class="fa fa-long-arrow-right ml-2"></i>
+                    </a>
+                </div>
+                
+                <!-- 闲暇时光2 -->
+                <div class="memory-card bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                    <div class="relative overflow-hidden rounded-lg mb-4 group">
+                        <!-- 优化后的图片显示 -->
+                        <img src=主页图片\图片2.jpg
+                             class="w-full h-auto object-cover aspect-[4/3] rounded-lg transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-2">和他一起做美食</h3>
+                    <p class="text-white/70 text-sm">他喜欢吃地球的美食，在你制作美食时，他会笨拙地帮你打下手...</p>
+                    <a href="三明治游戏.html" class="mt-4 text-starlight-gold hover:text-white transition-colors flex items-center">
+                        <span>开始制作</span>
+                        <i class="fa fa-long-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 星轨观测板块 -->
+        <section>
+            <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-white text-shadow mb-8 text-center">星轨观测</h2>
+            
+            <div class="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/20">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-semibold text-white mb-4">探索星轨</h3>
+                        <p class="text-white/70 mb-6">星轨是宇宙的年轮...而你是所有轨迹的交点</p>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-starlight-gold mr-3"></div>
+                                <span class="text-white/80">星空观测：对未知的无限探索欲望</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-starlight-purple mr-3"></div>
+                                <span class="text-white/80">星舰巡航：当星轨出现断裂，可能是暗物质干扰...</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full bg-white mr-3"></div>
+                                <span class="text-white/80">星河邀约：任务中我计算过许多次流星轨迹...许愿时记得闭眼</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 优化后的"开始探索"按钮 -->
+                        <a href="星轨观测.html" id="explore-btn" class="mt-8 bg-starlight-purple hover:bg-starlight-purple/90 text-white font-medium py-3 px-6 rounded-lg btn-hover inline-block transition-all duration-300 text-center">
+                            开始探索
+                        </a>
+                    </div>
+                    
+                    <div class="relative h-[400px]">
+                        <div class="absolute inset-0 orbit">
+                            <div class="absolute w-12 h-12 bg-starlight-gold rounded-full shadow-lg flex items-center justify-center" style="top: 50%; left: 0; transform: translate(-50%, -50%);">
+                                <i class="fa fa-rocket text-white"></i>
+                            </div>
+                            <div class="absolute w-10 h-10 bg-starlight-purple rounded-full shadow-lg flex items-center justify-center" style="top: 10%; left: 25%; transform: translate(-50%, -50%);">
+                                <i class="fa fa-telescope text-white"></i>
+                            </div>
+                            <div class="absolute w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center" style="top: 90%; left: 25%; transform: translate(-50%, -50%);">
+                                <i class="fa fa-book text-starlight-dark"></i>
+                            </div>
+                            <div class="absolute w-9 h-9 bg-pink-400 rounded-full shadow-lg flex items-center justify-center" style="top: 10%; left: 75%; transform: translate(-50%, -50%);">
+                                <i class="fa fa-heart text-white"></i>
+                            </div>
+                            <div class="absolute w-11 h-11 bg-blue-400 rounded-full shadow-lg flex items-center justify-center" style="top: 90%; left: 75%; transform: translate(-50%, -50%);">
+                                <i class="fa fa-moon-o text-white"></i>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-20 h-20 bg-starlight-dark rounded-full shadow-xl flex items-center justify-center">
+                                <div class="planet-container w-16 h-16">
+                                    <div class="planet"></div>
+                                    <div class="planet-ring"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white/5 backdrop-blur-xl border-t border-white/20 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-white/40 text-sm">© 2025 STAR · 沈星回主题站</p>
+            <div class="flex justify-center mt-4 space-x-6">
+                <a href="#" class="text-white/60 hover:text-starlight-purple transition-colors">
+                    <i class="fa fa-weibo"></i>
+                </a>
+                <a href="#" class="text-white/60 hover:text-starlight-purple transition-colors">
+                    <i class="fa fa-weixin"></i>
+                </a>
+                <a href="#" class="text-white/60 hover:text-starlight-purple transition-colors">
+                    <i class="fa fa-twitter"></i>
+                </a>
+                <a href="#" class="text-white/60 hover:text-starlight-purple transition-colors">
+                    <i class="fa fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 生成背景星星
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const count = 150;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star-bg');
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 随机大小
+                const size = Math.random() * 3 + 1;
+                
+                // 随机延迟
+                const delay = Math.random() * 5;
+                
+                star.style.left = `${x}vw`;
+                star.style.top = `${y}vh`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 沈星回台词库 - 共150句
+        const shenxinghuiMessages = [
+            "闪来了！",
+            "我好想你",
+            "如果这个世界真的已经无处可逃，那至少你还可以逃来我身边",
+            "宇宙吸引力法则第二条——想见的人，无论过多久都会再见",
+            "我从来不会松开你，现在，以后，都不会",
+            "有时候，追求自由就是放弃自由",
+            "星光会指引我们再次相遇",
+            "你不只是孤单一人，你可以来依靠我",
+            "在这广阔的宇宙中，你是我唯一的确定。",
+            "想和你分享同一块饼干。",
+            "你的笑容，是我在无尽黑暗中看到的最亮的星光。",
+            "即使跨越光年的距离，我的心也会永远朝向你的方向。",
+            "宇宙在膨胀，但我对你的爱永远不会改变。",
+            "每一个星辰都是宇宙写给我们的情书。",
+            "你是我生命中最美的意外，也是我最珍贵的礼物。",
+            "无论前方有多少未知，我都会牵着你的手一起面对。",
+            "时间和空间都无法阻隔我对你的思念。",
+            "你的存在本身，就是对我最好的治愈。",
+            "我愿意成为你的避风港，为你遮挡所有的风雨。",
+            "在你身边，即使最平凡的瞬间也变得无比珍贵。",
+            "你眼中的星辰大海，比任何天体都要璀璨。",
+            "我会记住你每一个微笑的样子，就像记住最亮的恒星。",
+            "你是我在茫茫宇宙中寻找的那个特别的存在。",
+            "有时候，寂静比语言更能传达心意。",
+            "如果下一个春天还很遥远，我们就现在见面吧。",
+            "你的声音，是我听过的最动人的宇宙之歌。",
+            "在这个瞬息万变的世界里，你是我的永恒。",
+            "即使宇宙终结，我对你的爱也不会消逝。",
+            "你是我生命中最亮的那颗星，永远指引着我。",
+            "这次，可以陪我久一点吗？",
+            "与你共度的每一刻，都是我生命中最美好的时光。",
+            "和你有关的事，都很重要",
+            "我愿意为你摘下天上的星星，只要你开心。",
+            "晚安，我的白日梦",
+            "无论发生什么，我都会一直在你身边。",
+            "你是我生命中最美丽的风景，永远看不够。",
+            "我会用我的一生，证明我对你的爱是真实的。",
+            "你想见我的时候，我就回来了。",
+            "即使面对整个宇宙的挑战，我也不会退缩，因为有你。",
+            "你的温暖，是我在冰冷宇宙中最需要的东西。",
+            "我会为你创造一个属于我们的小宇宙。",
+            "你是我生命中最重要的人，没有之一。",
+            "我相信我们的故事，会成为宇宙中最美的传说。",
+            "春天到了，总会有希望的",
+            "在这个无限的宇宙中，你是我的唯一限定。",
+            "我会用我的全部力量，保护你不受任何伤害。",
+            "你是我生命中最美好的意外，也是我最幸福的选择。",
+            "即使世界崩塌，我对你的爱也会像恒星一样永恒。",
+            "你的微笑，能驱散宇宙中所有的黑暗。",
+            "我会陪你走过每一个季节，看遍宇宙的美景。",
+            "很高兴认识你，不是客套。",
+            "我愿意为你付出一切，只要你能幸福。",
+            "你的存在，让我的生命变得有意义。",
+            "我会珍惜与你在一起的每一刻。",
+            "你是我在宇宙中最珍贵的宝藏，永远不会被取代。",
+            "即使时间倒流，我还是会选择遇见你。",
+            "你的温柔，是我在宇宙中最温暖的港湾。",
+            "我会为你谱写一首永恒的情歌，直到宇宙尽头。",
+            "你是我生命中最美好的礼物，我会好好珍藏。",
+            "我相信我们的爱情，能跨越任何维度的限制。",
+            "你的每一个小动作，都让我心动不已。",
+            "在这个广阔的宇宙中，你是我唯一的目的地。",
+            "我会用我的全部真心，爱你直到永远。",
+            "你是我生命中最美丽的画卷，永远不会褪色。",
+            "即使面对宇宙的终结，我也不会放弃我们。",
+            "你的笑声，是我听过的最动听的宇宙旋律。",
+            "我会陪你看遍宇宙中的每一个日出和日落。",
+            "你是我生命中最重要的决定，我从不后悔。",
+            "我愿意为你做任何事，只要你能开心。",
+            "你的存在，让我明白了什么是真正的幸福。",
+            "我会守护你这个宇宙中最特别的存在。",
+            "你是我在宇宙中最珍贵的发现，永远值得珍惜。",
+            "即使世界变得陌生，我对你的爱也不会改变。",
+            "美梦会成真，我自然也是真的",
+            "我会为你创造一个充满爱的宇宙，只属于我们两个人。",
+            "你是我生命中最美好的回忆，永远不会忘记。",
+            "我相信我们的爱情，能战胜一切困难和挑战。",
+            "你的每一句话，都像星星一样闪耀在我心中。",
+            "在这个复杂的宇宙中，你是我最简单的快乐。",
+            "我会用我的全部热情，爱你直到永远。",
+            "你是我生命中最亮的光芒，照亮我前行的道路。",
+            "即使面对未知的危险，我也会保护你周全。",
+            "你的温暖，是我在宇宙中最渴望的温度。",
+            "我会为你建造一个安全的港湾，让你永远安心。",
+            "你是我生命中最美好的意外，也是我最珍贵的宝藏。",
+            "我相信我们的爱情，能穿越时空的界限。",
+            "你的每一个眼神，都让我心动不已。",
+            "在这个浩瀚的宇宙中，你是我唯一的依靠。",
+            "我会用我的一生，陪伴你走过每一个春夏秋冬。",
+            "你是我生命中最美丽的风景，永远铭刻在我心中。",
+            "即使宇宙毁灭，我对你的爱也会永远存在。",
+            "你的微笑，是我在宇宙中最想守护的东西。",
+            "我会陪你探索宇宙的每一个角落，直到时间尽头。",
+            "你是我生命中最重要的人，我会用一生去爱你。",
+            "我愿意为你付出一切，只要你能感受到我的爱。",
+            "你的存在，让我的世界变得更加美好。",
+            "我会用我的全部真心，换取你一生的幸福。",
+            "你是我在宇宙中最珍贵的宝物，我会好好保护你。",
+            "即使面对再大的困难，我也不会离开你。",
+            "你的温柔，是我在宇宙中最温暖的依靠。",
+            "我会为你创造一个充满阳光的未来，只属于我们。",
+            "你是我生命中最美好的礼物，我会用一生去珍惜。",
+            "我相信我们的爱情，能经得起时间的考验。",
+            "你的每一个动作，都让我感受到无尽的爱意。",
+            "在这个无限的宇宙中，你是我的有限温柔。",
+            "我会用我的全部热情，点燃你心中的火焰。",
+            "你是我生命中最亮的星，永远照耀着我。",
+            "即使面对整个宇宙的敌意，我也会站在你身边。",
+            "你的存在，让我的生命变得完整。",
+            "我会用我的一生，证明我对你的爱是永恒的。",
+            "宇宙中最浪漫的事，就是和你一起看星星。",
+            "没遇见春天，先遇见了你。",
+            "把星光戴在手上，怎么样。",
+            "和你在一起，连时间都失去了意义。",
+            "醒来看到了梦里出现的人。",
+            "睡着或是醒来，我都会在。",
+            "谢谢你刚好在我身边。",
+            "喜欢你的心跳，不只心跳。",
+            "牵住你，就不会松开手了。",
+            "和你一起看星的夜晚，是我最珍惜的宇宙时刻。",
+            "你的存在，让我的宇宙不再黑暗。",
+            "在浩瀚星海中，我终于找到了我的归宿。",
+            "我唯一的愿望是和你一起",
+            "有你出现的梦，格外真实",
+            "想和你分享同一块饼干",
+            "和你在一起，连光年都变得可以丈量。",
+            "你让生活变得有趣多了。",
+            "想到你，就不觉得疲惫了。",
+            "想见你，不只是每日限定。",
+            "第二杯半价也有人分享了。",
+            "你是我宇宙中最温暖的恒星。",
+            "在遇见你之后，我开始相信命运的存在。",
+            "你是我星系中最美的星云。",
+            "和你在一起，时间仿佛停止了流逝。",
+            "我想你，你想我了吗",
+            "我的宇宙，因为你而有了意义。",
+            "你是我星图上最特别的标记。",
+            "和你一起看星，是我最幸福的时刻。",
+            "总会有希望的",
+            "在你的眼中，我看到了整个宇宙。",
+            "你是我星系中唯一的行星。",
+            "希望我能成为你的归属，永远在你眼中",
+            "要不要一起去晒星星？",
+            "我的心，永远围绕着你旋转。",
+            "宇宙的第三定律，是我和你。",
+            "今晚的我好像...特别难哄。",
+            "你是我宇宙中最温暖的存在。",
+            "在遇见你之后，我的宇宙不再孤单。",
+            "你是我星系中最美的风景。",
+            "和你在一起，时间变得无关紧要。",
+            "双人游戏不会再缺队友了。",
+            "无论多少次，无论你在哪，我都会找到你",
+            "每一句明天见都不食言",
+            "和你一起看星，是我最浪漫的事。",
+            "你是我宇宙中最亮的恒星。",
+            "在你的身边，我找到了宇宙的意义。",
+            "不理人，我就不走了。",
+            "可我本就偏心你。",
+            "楼下的猫很想你，我也是。",
+            "我的心，永远指向你的方向。",
+            "需要后援时，我一直都在。",
+            "和你一起探索宇宙，是我最大的幸福。",
+            "才说了再见就开始想你"
+        ];
+        
+        // 生成星语星星系统
+        function createStarLanguages() {
+            const container = document.getElementById('orbit-container');
+            const starCount = 20; // 20个星星
+            
+            // 星星颜色数组
+            const starColors = [
+                '#a855f7', '#fde047', '#4a148c', '#f472b6', '#60a5fa', 
+                '#ec4899', '#8b5cf6', '#3b82f6', '#f97316', '#10b981', 
+                '#06b6d4', '#e879f9', '#f59e0b', '#14b8a6', '#84cc16', 
+                '#0ea5e9', '#a78bfa', '#f43f5e', '#6366f1', '#f0abfc'
+            ];
+            
+            // 清除之前的星星
+            container.innerHTML = '';
+            
+            // 创建多层轨道
+            const orbit1 = document.createElement('div');
+            orbit1.classList.add('orbit');
+            orbit1.style.width = '80%';
+            orbit1.style.height = '80%';
+            orbit1.style.top = '10%';
+            orbit1.style.left = '10%';
+            orbit1.style.animationDuration = '80s';
+            container.appendChild(orbit1);
+            
+            const orbit2 = document.createElement('div');
+            orbit2.classList.add('orbit');
+            orbit2.style.width = '60%';
+            orbit2.style.height = '60%';
+            orbit2.style.top = '20%';
+            orbit2.style.left = '20%';
+            orbit2.style.animationDuration = '60s';
+            orbit2.style.animationDirection = 'reverse';
+            container.appendChild(orbit2);
+            
+            const orbit3 = document.createElement('div');
+            orbit3.classList.add('orbit');
+            orbit3.style.width = '40%';
+            orbit3.style.height = '40%';
+            orbit3.style.top = '30%';
+            orbit3.style.left = '30%';
+            orbit3.style.animationDuration = '40s';
+            container.appendChild(orbit3);
+            
+            const orbits = [container, orbit1, orbit2, orbit3];
+            
+            // 为每个星星分配专属的台词数组
+            const starMessages = Array.from({length: starCount}, () => {
+                const messages = [...shenxinghuiMessages];
+                // 随机打乱顺序
+                for (let i = messages.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [messages[i], messages[j]] = [messages[j], messages[i]];
+                }
+                return messages;
+            });
+            
+            // 记录每个星星已使用的台词索引
+            const starUsedIndices = Array.from({length: starCount}, () => new Set());
+            
+            // 创建星星
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star-language');
+                
+                // 设置星星颜色
+                const color = starColors[i % starColors.length];
+                star.style.backgroundColor = color;
+                star.style.boxShadow = `0 0 15px ${color}`;
+                
+                // 随机选择轨道
+                const orbitIndex = Math.floor(Math.random() * orbits.length);
+                const orbit = orbits[orbitIndex];
+                
+                // 设置星星在轨道上的位置，确保星星之间有足够的间距
+                let angle, radius, x, y;
+                let validPosition = false;
+                let attempts = 0;
+                const minDistance = 50; // 最小间距（像素），约等于5mm
+                
+                // 尝试找到一个不会与其他星星重叠的位置
+                while (!validPosition && attempts < 100) {
+                    angle = Math.random() * 360;
+                    radius = orbit === container ? 40 : (orbit.clientWidth / 2) - 20;
+                    x = Math.cos(angle * Math.PI / 180) * radius + (orbit.clientWidth / 2);
+                    y = Math.sin(angle * Math.PI / 180) * radius + (orbit.clientHeight / 2);
+                    
+                    // 检查与已有星星的距离
+                    validPosition = true;
+                    document.querySelectorAll('.star-language').forEach(existingStar => {
+                        const rect = existingStar.getBoundingClientRect();
+                        const existingX = rect.left + rect.width / 2;
+                        const existingY = rect.top + rect.height / 2;
+                        
+                        const distance = Math.sqrt(Math.pow(x - existingX, 2) + Math.pow(y - existingY, 2));
+                        if (distance < minDistance) {
+                            validPosition = false;
+                        }
+                    });
+                    
+                    attempts++;
+                }
+                
+                star.style.left = `${x}px`;
+                star.style.top = `${y}px`;
+                
+                // 设置星星大小和动画
+                star.style.animation = `float ${5 + Math.random() * 10}s ease-in-out infinite ${Math.random() * 5}s`;
+                
+                // 添加星星图标
+                star.innerHTML = '<i class="fa fa-star text-white"></i>';
+                
+                // 星星ID
+                star.dataset.id = i;
+                
+                // 添加点击事件
+                star.addEventListener('click', function() {
+                    // 移除所有星星的活跃状态
+                    document.querySelectorAll('.star-language').forEach(s => {
+                        s.classList.remove('active');
+                    });
+                    
+                    // 添加当前星星的活跃状态
+                    this.classList.add('active');
+                    
+                    // 获取星星ID
+                    const starId = parseInt(this.dataset.id);
+                    
+                    // 获取该星星专属的台词数组
+                    const messages = starMessages[starId];
+                    const usedIndices = starUsedIndices[starId];
+                    
+                    // 选择一个未使用的台词索引
+                    let messageIndex;
+                    if (usedIndices.size >= messages.length) {
+                        // 如果所有台词都已使用，则重置已使用索引
+                        usedIndices.clear();
+                    }
+                    
+                    // 随机选择一个未使用的索引
+                    do {
+                        messageIndex = Math.floor(Math.random() * messages.length);
+                    } while (usedIndices.has(messageIndex));
+                    
+                    // 标记该索引已使用
+                    usedIndices.add(messageIndex);
+                    
+                    // 显示对应的台词
+                    document.getElementById('language-text').textContent = messages[messageIndex];
+                    
+                    // 添加显示动画
+                    const displayBox = document.getElementById('language-display');
+                    displayBox.style.transform = 'translate(-50%, 20px)';
+                    displayBox.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        displayBox.style.transform = 'translate(-50%, 0)';
+                        displayBox.style.opacity = '1';
+                    }, 100);
+                });
+                
+                orbit.appendChild(star);
+            }
+        }
+        
+        // 页面加载完成后执行
+        window.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            createStarLanguages();
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // 优化"开始探索"按钮的跳转性能
+            const exploreBtn = document.getElementById('explore-btn');
+            if (exploreBtn) {
+                // 移除默认的过渡效果，确保立即跳转
+                exploreBtn.style.transition = 'none';
+                
+                // 优化点击事件处理
+                exploreBtn.addEventListener('click', function(e) {
+                    // 防止事件冒泡
+                    e.stopPropagation();
+                    
+                    // 立即跳转，使用更高效的location.href
+                    window.location.href = this.getAttribute('href');
+                });
+            }
+        });
+    </script>
+</body>
+</html>    

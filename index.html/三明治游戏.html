@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>沈星回的星空三明治工坊</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#FF9BB3',    // 柔和粉色主色调
+            secondary: '#FFD6A5',   // 奶黄色辅助色
+            accent: '#FF6B9B',      // 亮粉色点缀
+            dark: '#3A3A5D',        // 深紫色背景
+            light: '#FFF5F7',       // 淡粉色背景
+            cucumber: '#84E0C6',    // 薄荷绿黄瓜色
+            cream: '#FFF9D9',       // 奶油色
+            bread: '#FFD1A2',       // 浅棕色面包色
+          },
+          fontFamily: {
+            cute: ['"Comic Sans MS"', '"Marker Felt"', 'Arial', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .text-shadow-lg {
+        text-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+      }
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+      .animate-sparkle {
+        animation: sparkle 1.5s infinite;
+      }
+      .animate-bounce-soft {
+        animation: bounce-soft 2s infinite;
+      }
+      .animate-pulse-slow {
+        animation: pulse-slow 3s infinite;
+      }
+      .bg-star-pattern {
+        background-image: radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+      .card-cute {
+        @apply rounded-2xl border-2 border-white/30 shadow-lg bg-white/20 backdrop-blur-sm;
+      }
+      .btn-cute {
+        @apply rounded-full py-3 px-6 font-bold shadow-lg transform hover:scale-105 transition-all duration-300;
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    @keyframes bounce-soft {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-primary/30 to-dark font-cute text-dark overflow-x-hidden">
+  <!-- 星空背景 -->
+  <div class="fixed inset-0 bg-star-pattern opacity-40 z-0"></div>
+  <div class="fixed inset-0 bg-gradient-to-b from-primary/50 to-dark/80 z-0"></div>
+  
+  <!-- 星星特效 -->
+  <div id="stars" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <!-- 游戏容器 -->
+  <div class="relative min-h-screen flex flex-col items-center justify-between z-10">
+    
+    <!-- 顶部导航栏 -->
+    <header class="w-full p-4 flex justify-between items-center bg-primary/40 backdrop-blur-md border-b border-white/20">
+      <div class="flex items-center gap-2">
+        <i class="fa fa-cutlery text-2xl text-accent animate-sparkle"></i>
+        <h1 class="text-xl md:text-2xl font-bold text-shadow">沈星回的星空三明治工坊</h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <!-- 新增的"回到首页"导航链接 -->
+        <a href="主页.html" class="flex items-center gap-1 text-accent hover:text-accent/80 transition-colors animate-pulse-slow">
+          <i class="fa fa-home"></i>
+          <span>回到首页</span>
+        </a>
+        <div class="flex items-center gap-1">
+          <i class="fa fa-star text-yellow-400 animate-sparkle"></i>
+          <span id="star-coins" class="font-bold">0</span>
+        </div>
+        <button id="help-btn" class="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all animate-pulse-slow">
+          <i class="fa fa-question-circle"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- 主游戏区域 -->
+    <main class="flex-1 w-full max-w-6xl p-4 md:p-8 flex flex-col items-center justify-center">
+      
+      <!-- 开始界面 -->
+      <section id="start-screen" class="w-full h-full flex flex-col items-center justify-center gap-8 text-center">
+        <div class="relative w-48 h-48 md:w-64 md:h-64 animate-float">
+          <div class="absolute inset-0 bg-accent/20 rounded-full blur-2xl animate-pulse-slow"></div>
+          <img src="三明治图片\厨房.jpg" alt="兔球球Q版形象" class="relative w-full h-full object-cover rounded-full border-4 border-white/30 shadow-lg">
+        </div>
+        <h2 class="text-3xl md:text-5xl font-bold text-shadow-lg">欢迎来到<br>沈星回的三明治工坊</h2>
+        <p class="text-lg md:text-xl max-w-md opacity-90">和沈星回一起制作超可爱的酸奶油青瓜三明治吧！</p>
+        <button id="start-btn" class="px-8 py-4 bg-accent hover:bg-accent/80 text-white rounded-full text-lg font-bold shadow-lg transform hover:scale-105 transition-all flex items-center gap-2 animate-bounce-soft">
+          <i class="fa fa-play"></i> 开始游戏
+        </button>
+      </section>
+      
+      <!-- 游戏界面 -->
+      <section id="game-screen" class="w-full h-full flex flex-col gap-6 hidden">
+        <!-- 顾客订单 -->
+        <div class="card-cute p-4">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-secondary">
+              <img id="customer-img" src="三明治图片\兔.jpg" alt="顾客形象" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <h3 id="customer-name" class="font-bold text-xl">兔球球</h3>
+              <p id="order-text" class="text-sm opacity-90">我想要一个有星星图案的酸奶油青瓜三明治！</p>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <div class="flex items-center gap-1">
+                <i class="fa fa-clock-o text-secondary"></i>
+                <span id="timer" class="font-mono">60</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 制作区域 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100%-10rem)]">
+          <!-- 食材区 -->
+          <div class="card-cute p-4 flex flex-col gap-4">
+            <h3 class="font-bold text-lg border-b border-white/20 pb-2">食材选择</h3>
+            <div class="grid grid-cols-2 gap-3 flex-1">
+              <div id="bread-1" class="ingredient-card bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer border-2 border-transparent hover:border-secondary/50 transition-all flex flex-col items-center justify-center animate-pulse-slow">
+                <img src="三明治图片\白面包.jpg" alt="月光白面包" class="w-16 h-16 object-contain">
+                <p class="text-xs mt-2">月光白面包</p>
+              </div>
+              <div id="bread-2" class="ingredient-card bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer border-2 border-transparent hover:border-secondary/50 transition-all flex flex-col items-center justify-center animate-pulse-slow">
+                <img src="三明治图片\全麦面包.jpg" alt="星尘全麦面包" class="w-16 h-16 object-contain">
+                <p class="text-xs mt-2">星尘全麦面包</p>
+              </div>
+              <div id="cucumber" class="ingredient-card bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer border-2 border-transparent hover:border-secondary/50 transition-all flex flex-col items-center justify-center animate-pulse-slow">
+                <img src="三明治图片\青瓜.jpg" alt="星尘青瓜" class="w-16 h-16 object-contain">
+                <p class="text-xs mt-2">星尘青瓜</p>
+              </div>
+              <div id="cream" class="ingredient-card bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer border-2 border-transparent hover:border-secondary/50 transition-all flex flex-col items-center justify-center animate-pulse-slow">
+                <img src="三明治图片\酸奶油.jpg" alt="星云酸奶油" class="w-16 h-16 object-contain">
+                <p class="text-xs mt-2">星云酸奶油</p>
+              </div>
+              <div id="spice-1" class="ingredient-card bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer border-2 border-transparent hover:border-secondary/50 transition-all flex flex-col items-center justify-center animate-pulse-slow">
+                <img src="三明治图片\莳萝.jpg" alt="流星莳萝" class="w-16 h-16 object-contain">
+                <p class="text-xs mt-2">流星莳萝</p>
+              </div>
+              <div id="spice-2" class="ingredient-card bg-white/10 hover:bg-white/20 rounded-xl p-3 cursor-pointer border-2 border-transparent hover:border-secondary/50 transition-all flex flex-col items-center justify-center animate-pulse-slow">
+                <img src="三明治图片\薄荷.jpg" alt="银河薄荷" class="w-16 h-16 object-contain">
+                <p class="text-xs mt-2">银河薄荷</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 制作区 -->
+          <div class="card-cute p-4 flex flex-col">
+            <h3 class="font-bold text-lg border-b border-white/20 pb-2">制作区</h3>
+            <div id="prep-area" class="flex-1 flex flex-col items-center justify-center relative">
+              <div id="cutting-board" class="w-full h-full flex items-center justify-center relative">
+                <!-- 面包层 -->
+                <div id="bread-bottom" class="absolute w-3/4 h-16 shadow-md hidden">
+                  <img id="bread-bottom-img" src="三明治图片\全麦面包.jpg" alt="底部面包" class="w-full h-full object-cover rounded-t-3xl">
+                </div>
+                <!-- 酸奶油层 -->
+                <div id="cream-layer" class="absolute w-3/4 h-8 shadow-md hidden">
+                  <img src="三明治图片\酸奶油.jpg" alt="酸奶油层" class="w-full h-full object-cover rounded-md">
+                </div>
+                <!-- 黄瓜层 -->
+                <div id="cucumber-layer" class="absolute w-3/4 h-16 shadow-md hidden flex items-center justify-center gap-1">
+                  <!-- 黄瓜片将在这里动态生成 -->
+                </div>
+                <!-- 香料层 -->
+                <div id="spice-layer" class="absolute w-3/4 h-16 shadow-md hidden flex items-center justify-center gap-1">
+                  <!-- 香料将在这里动态生成 -->
+                </div>
+                <!-- 顶部面包 -->
+                <div id="bread-top" class="absolute w-3/4 h-16 shadow-md hidden">
+                  <img id="bread-top-img" src="三明治图片\全麦面包.jpg" alt="顶部面包" class="w-full h-full object-cover rounded-b-3xl">
+                </div>
+                
+                <!-- 切片小游戏 -->
+                <div id="cutting-game" class="absolute inset-0 bg-black/50 flex items-center justify-center hidden">
+                  <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl text-center card-cute">
+                    <h4 class="text-xl font-bold mb-4">切片小游戏</h4>
+                    <p class="text-sm mb-4">滑动屏幕切割黄瓜，切得越均匀得分越高！</p>
+                    <div id="cucumber-to-cut" class="w-24 h-6 bg-cucumber rounded-full mx-auto mb-4 relative overflow-hidden">
+                      <img src="三明治图片\青瓜.jpg" alt="完整黄瓜" class="w-full h-full object-cover rounded-full">
+                      <div id="cutting-knife" class="absolute top-0 left-1/2 w-1 h-12 bg-white rounded-t-md -translate-x-1/2 -translate-y-12 hidden animate-pulse-slow"></div>
+                    </div>
+                    <button id="start-cutting-btn" class="btn-cute bg-accent text-white">开始切片</button>
+                  </div>
+                </div>
+                
+                <!-- 涂抹小游戏 -->
+                <div id="spreading-game" class="absolute inset-0 bg-black/50 flex items-center justify-center hidden">
+                  <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl text-center card-cute">
+                    <h4 class="text-xl font-bold mb-4">涂抹酸奶油</h4>
+                    <p class="text-sm mb-4">在面包上均匀涂抹酸奶油！</p>
+                    <div id="bread-to-spread" class="w-48 h-12 bg-bread rounded-t-3xl mx-auto mb-4 relative overflow-hidden">
+                      <img id="bread-to-spread-img" src="三明治图片\全麦面包.jpg" alt="待涂抹面包" class="w-full h-full object-cover">
+                      <div id="cream-spread" class="absolute bottom-0 left-0 w-full h-0 transition-all duration-100 bg-cream/80"></div>
+                    </div>
+                    <div class="flex gap-2 justify-center mb-4">
+                      <button id="spread-left-btn" class="btn-cute bg-primary/70 text-white">左</button>
+                      <button id="spread-right-btn" class="btn-cute bg-primary/70 text-white">右</button>
+                    </div>
+                    <button id="finish-spreading-btn" class="btn-cute bg-accent text-white">完成涂抹</button>
+                  </div>
+                </div>
+                
+                <!-- 摆放小游戏 -->
+                <div id="arranging-game" class="absolute inset-0 bg-black/50 flex items-center justify-center hidden">
+                  <div class="bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl text-center card-cute">
+                    <h4 class="text-xl font-bold mb-4">摆放黄瓜片</h4>
+                    <p class="text-sm mb-4">按照提示摆放黄瓜片</p>
+                    <div id="arranging-area" class="w-64 h-64 bg-white/5 rounded-2xl mx-auto mb-4 relative overflow-hidden">
+                      <!-- 星星图案模板 -->
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-full h-full opacity-30">
+                          <path d="M50,10 L61,40 L94,40 L68,60 L79,90 L50,70 L21,90 L32,60 L6,40 L39,40 Z" fill="none" stroke="white" stroke-width="2" />
+                        </svg>
+                      </div>
+                      <!-- 黄瓜片将在这里动态生成并可拖动 -->
+                    </div>
+                    <button id="finish-arranging-btn" class="btn-cute bg-accent text-white">完成摆放</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button id="serve-btn" class="mt-4 btn-cute bg-accent text-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa fa-paper-plane"></i> 提交订单
+            </button>
+          </div>
+          
+          <!-- 沈星回指导区域 -->
+          <div class="card-cute p-4 flex flex-col">
+            <h3 class="font-bold text-lg border-b border-white/20 pb-2">沈星回的指导</h3>
+            <div class="flex-1 flex flex-col items-center justify-center">
+              <div class="relative w-32 h-32 md:w-40 md:h-40 animate-float">
+                <img src="三明治图片\回.jpg" alt="沈星回" class="w-full h-full object-cover rounded-full border-4 border-secondary/50 shadow-lg">
+              </div>
+              <div id="shen-dialog" class="mt-4 bg-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/20 shadow-md w-full text-center min-h-[100px] flex items-center justify-center">
+                <p>欢迎来到我的三明治工坊，让我们开始制作美味的三明治吧！</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 评分界面 -->
+      <section id="score-screen" class="w-full h-full flex flex-col items-center justify-center gap-8 text-center hidden">
+        <div class="card-cute p-8 max-w-md w-full">
+          <h2 class="text-2xl md:text-3xl font-bold mb-4">订单完成！</h2>
+          <div class="flex justify-center gap-1 mb-6">
+            <i id="star-1" class="fa fa-star-o text-2xl text-yellow-400"></i>
+            <i id="star-2" class="fa fa-star-o text-2xl text-yellow-400"></i>
+            <i id="star-3" class="fa fa-star-o text-2xl text-yellow-400"></i>
+            <i id="star-4" class="fa fa-star-o text-2xl text-yellow-400"></i>
+            <i id="star-5" class="fa fa-star-o text-2xl text-yellow-400"></i>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-white/10 rounded-xl p-3">
+              <p class="text-sm opacity-80">速度评分</p>
+              <p id="speed-score" class="text-xl font-bold">3/5</p>
+            </div>
+            <div class="bg-white/10 rounded-xl p-3">
+              <p class="text-sm opacity-80">美观度评分</p>
+              <p id="beauty-score" class="text-xl font-bold">4/5</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center gap-2 mb-6">
+            <i class="fa fa-star text-yellow-400 animate-sparkle"></i>
+            <span id="stars-earned" class="text-xl font-bold">+3</span>
+            <span class="opacity-80">星回币</span>
+          </div>
+          <div class="flex gap-3 w-full">
+            <button id="next-order-btn" class="flex-1 btn-cute bg-accent text-white">
+              下一个订单
+            </button>
+            <button id="home-btn" class="flex-1 btn-cute bg-white/20 text-dark">
+              主页
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 帮助界面 -->
+      <section id="help-screen" class="w-full h-full flex flex-col items-center justify-center gap-8 text-center hidden">
+        <div class="card-cute p-8 max-w-md w-full">
+          <h2 class="text-2xl md:text-3xl font-bold mb-4">游戏帮助</h2>
+          <div class="text-left space-y-4 mb-6">
+            <div>
+              <h3 class="font-bold text-lg mb-2">游戏目标</h3>
+              <p>帮助兔球球制作完美的酸奶油青瓜三明治，满足顾客的需求，获得高分！</p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">游戏流程</h3>
+              <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>选择面包类型</li>
+                <li>切割黄瓜（滑动屏幕）</li>
+                <li>涂抹酸奶油（左右按钮）</li>
+                <li>摆放黄瓜片（完成星星图案）</li>
+                <li>添加调味料</li>
+                <li>提交订单</li>
+              </ol>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">评分标准</h3>
+              <ul class="list-disc list-inside space-y-1 text-sm">
+                <li>速度：制作时间越短得分越高</li>
+                <li>美观度：黄瓜片摆放越整齐得分越高</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg mb-2">奖励</h3>
+              <p>每次完成订单可获得星回币，用于解锁更多食材和装饰！</p>
+            </div>
+          </div>
+          <button id="close-help-btn" class="w-full btn-cute bg-accent text-white">
+            返回游戏
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- 底部信息 -->
+    <footer class="w-full p-4 text-center text-sm opacity-70 border-t border-white/20">
+      <p>沈星回的星空三明治工坊 &copy; 2025</p>
+    </footer>
+  </div>
+
+  <script>
+    // 游戏状态管理
+    const gameState = {
+      currentScreen: 'start', // 'start', 'game', 'score', 'help'
+      selectedBread: null,
+      hasCucumber: false,
+      hasCream: false,
+      cucumberSlices: 0,
+      creamSpread: 0,
+      cucumberArranged: false,
+      spicesAdded: 0,
+      totalStars: 0,
+      currentOrder: {
+        customer: '兔球球',
+        image: '三明治图片\\兔.jpg',
+        order: '我想要一个有星星图案的酸奶油青瓜三明治！'
+      },
+      timer: 60,
+      timerInterval: null,
+      score: {
+        speed: 0,
+        beauty: 0,
+        total: 0
+      }
+    };
+    
+    // 顾客列表
+    const customers = [
+      {
+        name: '兔球球',
+        image: '三明治图片\\兔.jpg',
+        orders: [
+          '我想要一个有星星图案的酸奶油青瓜三明治！',
+          '请给我一个酸奶油多一点的三明治，配上星尘全麦面包。',
+          '我喜欢薄切黄瓜的三明治，再加些银河薄荷！'
+        ]
+      },
+      {
+        name: '星际小宝',
+        image: '三明治图片\\图片3.jpg',
+        orders: [
+          '我想要一个完美对称的酸奶油青瓜三明治！',
+          '请用月光白面包制作，酸奶油要涂得均匀一些。',
+          '我喜欢多层次的口感，黄瓜片要切得厚一点！'
+        ]
+      },
+      {
+        name: '邱诺亚',
+        image: '三明治图片\\邱.jpg',
+        orders: [
+          '请给我一个色彩丰富的酸奶油青瓜三明治，点缀上流星莳萝。',
+          '我想要一个酸奶油和黄瓜比例完美的三明治。',
+          '请用星尘全麦面包制作，酸奶油要涂满整个面包！'
+        ]
+      }
+    ];
+    
+    // DOM 元素
+    const screens = {
+      start: document.getElementById('start-screen'),
+      game: document.getElementById('game-screen'),
+      score: document.getElementById('score-screen'),
+      help: document.getElementById('help-screen')
+    };
+    
+    const elements = {
+      startBtn: document.getElementById('start-btn'),
+      helpBtn: document.getElementById('help-btn'),
+      closeHelpBtn: document.getElementById('close-help-btn'),
+      homeBtn: document.getElementById('home-btn'),
+      nextOrderBtn: document.getElementById('next-order-btn'),
+      serveBtn: document.getElementById('serve-btn'),
+      customerImg: document.getElementById('customer-img'),
+      customerName: document.getElementById('customer-name'),
+      orderText: document.getElementById('order-text'),
+      timer: document.getElementById('timer'),
+      shenDialog: document.getElementById('shen-dialog'),
+      starCoins: document.getElementById('star-coins'),
+      // 食材卡片
+      bread1: document.getElementById('bread-1'),
+      bread2: document.getElementById('bread-2'),
+      cucumber: document.getElementById('cucumber'),
+      cream: document.getElementById('cream'),
+      spice1: document.getElementById('spice-1'),
+      spice2: document.getElementById('spice-2'),
+      // 三明治组件
+      breadBottom: document.getElementById('bread-bottom'),
+      breadTop: document.getElementById('bread-top'),
+      breadBottomImg: document.getElementById('bread-bottom-img'),
+      breadTopImg: document.getElementById('bread-top-img'),
+      breadToSpreadImg: document.getElementById('bread-to-spread-img'),
+      creamLayer: document.getElementById('cream-layer'),
+      cucumberLayer: document.getElementById('cucumber-layer'),
+      spiceLayer: document.getElementById('spice-layer'),
+      // 小游戏
+      cuttingGame: document.getElementById('cutting-game'),
+      startCuttingBtn: document.getElementById('start-cutting-btn'),
+      cuttingKnife: document.getElementById('cutting-knife'),
+      spreadingGame: document.getElementById('spreading-game'),
+      spreadLeftBtn: document.getElementById('spread-left-btn'),
+      spreadRightBtn: document.getElementById('spread-right-btn'),
+      finishSpreadingBtn: document.getElementById('finish-spreading-btn'),
+      creamSpread: document.getElementById('cream-spread'),
+      arrangingGame: document.getElementById('arranging-game'),
+      arrangingArea: document.getElementById('arranging-area'),
+      finishArrangingBtn: document.getElementById('finish-arranging-btn'),
+      // 评分
+      starsEarned: document.getElementById('stars-earned'),
+      speedScore: document.getElementById('speed-score'),
+      beautyScore: document.getElementById('beauty-score'),
+      star1: document.getElementById('star-1'),
+      star2: document.getElementById('star-2'),
+      star3: document.getElementById('star-3'),
+      star4: document.getElementById('star-4'),
+      star5: document.getElementById('star-5')
+    };
+    
+    // 初始化游戏
+    function initGame() {
+      createDynamicStars();
+      setupEventListeners();
+      updateScreen();
+    }
+    
+    // 创建动态分布的星空背景
+    function createDynamicStars() {
+      const starsContainer = document.getElementById('stars');
+      starsContainer.innerHTML = '';
+      
+      // 创建大星星
+      for (let i = 0; i < 40; i++) {
+        const star = document.createElement('div');
+        const size = Math.random() * 4 + 1;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.background = 'white';
+        star.style.borderRadius = '50%';
+        star.style.position = 'absolute';
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.opacity = Math.random() * 0.8 + 0.2;
+        star.style.animation = `sparkle ${Math.random() * 3 + 2}s infinite`;
+        star.style.animationDelay = `${Math.random() * 2}s`;
+        starsContainer.appendChild(star);
+      }
+      
+      // 创建流星
+      setInterval(() => {
+        const meteor = document.createElement('div');
+        const size = Math.random() * 2 + 1;
+        const leftPos = Math.random() * 100;
+        meteor.style.width = `${size}px`;
+        meteor.style.height = `${size * 10}px`;
+        meteor.style.background = 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.7))';
+        meteor.style.position = 'absolute';
+        meteor.style.left = `${leftPos}%`;
+        meteor.style.top = '-10%';
+        meteor.style.transform = 'rotate(30deg)';
+        meteor.style.opacity = 0.8;
+        meteor.style.animation = `starfall ${Math.random() * 2 + 3}s linear forwards`;
+        starsContainer.appendChild(meteor);
+        
+        // 流星动画结束后移除元素
+        setTimeout(() => {
+          meteor.remove();
+        }, 5000);
+      }, 1500);
+    }
+    
+    // 设置事件监听器
+    function setupEventListeners() {
+      // 屏幕切换
+      elements.startBtn.addEventListener('click', startGame);
+      elements.helpBtn.addEventListener('click', showHelp);
+      elements.closeHelpBtn.addEventListener('click', hideHelp);
+      elements.homeBtn.addEventListener('click', goHome);
+      elements.nextOrderBtn.addEventListener('click', nextOrder);
+      elements.serveBtn.addEventListener('click', serveOrder);
+      
+      // 食材选择
+      elements.bread1.addEventListener('click', () => selectBread(1));
+      elements.bread2.addEventListener('click', () => selectBread(2));
+      elements.cucumber.addEventListener('click', prepareCucumber);
+      elements.cream.addEventListener('click', spreadCream);
+      elements.spice1.addEventListener('click', () => addSpice(1));
+      elements.spice2.addEventListener('click', () => addSpice(2));
+      
+      // 小游戏
+      elements.startCuttingBtn.addEventListener('click', startCutting);
+      elements.spreadLeftBtn.addEventListener('click', () => spreadCreamLeft());
+      elements.spreadRightBtn.addEventListener('click', () => spreadCreamRight());
+      elements.finishSpreadingBtn.addEventListener('click', finishSpreading);
+      elements.finishArrangingBtn.addEventListener('click', finishArranging);
+    }
+    
+    // 更新屏幕显示
+    function updateScreen() {
+      Object.keys(screens).forEach(screen => {
+        screens[screen].classList.add('hidden');
+      });
+      
+      if (screens[gameState.currentScreen]) {
+        screens[gameState.currentScreen].classList.remove('hidden');
+      }
+      
+      // 更新游戏状态显示
+      elements.starCoins.textContent = gameState.totalStars;
+      
+      if (gameState.currentScreen === 'game') {
+        updateOrderDisplay();
+        updateServeButton();
+      } else if (gameState.currentScreen === 'score') {
+        updateScoreDisplay();
+      }
+    }
+    
+    // 开始游戏
+    function startGame() {
+      gameState.currentScreen = 'game';
+      gameState.selectedBread = null;
+      gameState.hasCucumber = false;
+      gameState.hasCream = false;
+      gameState.cucumberSlices = 0;
+      gameState.creamSpread = 0;
+      gameState.cucumberArranged = false;
+      gameState.spicesAdded = 0;
+      
+      // 重置三明治显示
+      elements.breadBottom.classList.add('hidden');
+      elements.breadTop.classList.add('hidden');
+      elements.creamLayer.classList.add('hidden');
+      elements.cucumberLayer.classList.add('hidden');
+      elements.spiceLayer.classList.add('hidden');
+      elements.cucumberLayer.innerHTML = '';
+      elements.spiceLayer.innerHTML = '';
+      
+      // 随机选择一个顾客和他的口味
+      const randomCustomerIndex = Math.floor(Math.random() * customers.length);
+      const randomOrderIndex = Math.floor(Math.random() * customers[randomCustomerIndex].orders.length);
+      
+      gameState.currentOrder = {
+        customer: customers[randomCustomerIndex].name,
+        image: customers[randomCustomerIndex].image,
+        order: customers[randomCustomerIndex].orders[randomOrderIndex]
+      };
+      
+      // 重置计时器
+      gameState.timer = 60;
+      elements.timer.textContent = gameState.timer;
+      
+      // 如果已有计时器，先清除
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
+      
+      // 启动计时器
+      gameState.timerInterval = setInterval(() => {
+        gameState.timer--;
+        elements.timer.textContent = gameState.timer;
+        
+        if (gameState.timer <= 0) {
+          clearInterval(gameState.timerInterval);
+          serveOrder();
+        }
+      }, 1000);
+      
+      updateScreen();
+      showDialog('让我们开始制作超可爱的三明治吧！先选择一种面包。');
+    }
+    
+    // 显示帮助
+    function showHelp() {
+      gameState.previousScreen = gameState.currentScreen;
+      gameState.currentScreen = 'help';
+      updateScreen();
+    }
+    
+    // 隐藏帮助
+    function hideHelp() {
+      gameState.currentScreen = gameState.previousScreen || 'start';
+      updateScreen();
+    }
+    
+    // 返回主页
+    function goHome() {
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
+      gameState.currentScreen = 'start';
+      updateScreen();
+    }
+    
+    // 下一个订单
+    function nextOrder() {
+      startGame();
+    }
+    
+    // 更新订单显示
+    function updateOrderDisplay() {
+      elements.customerImg.src = gameState.currentOrder.image;
+      elements.customerName.textContent = gameState.currentOrder.customer;
+      elements.orderText.textContent = gameState.currentOrder.order;
+    }
+    
+    // 选择面包
+    function selectBread(type) {
+      gameState.selectedBread = type;
+      
+      // 设置面包图片
+      if (type === 1) {
+        elements.breadBottomImg.src = "三明治图片\\白面包.jpg";
+        elements.breadTopImg.src = "三明治图片\\白面包.jpg";
+        elements.breadToSpreadImg.src = "三明治图片\\白面包.jpg";
+      } else {
+        elements.breadBottomImg.src = "三明治图片\\全麦面包.jpg";
+        elements.breadTopImg.src = "三明治图片\\全麦面包.jpg";
+        elements.breadToSpreadImg.src = "三明治图片\\全麦面包.jpg";
+      }
+      
+      // 显示面包
+      elements.breadBottom.classList.remove('hidden');
+      elements.breadTop.classList.remove('hidden');
+      
+      // 更新兔球球对话
+      showDialog('另一种面包不需要吗？我可以帮你吃掉吗~现在让我们准备黄瓜吧。');
+      
+      // 高亮已选食材
+      highlightSelectedIngredients();
+    }
+    
+    // 准备黄瓜
+    function prepareCucumber() {
+      if (!gameState.selectedBread) {
+        showDialog('请先选择面包哦！');
+        return;
+      }
+      
+      if (gameState.hasCucumber) {
+        showDialog('黄瓜已经准备好了呀！');
+        return;
+      }
+      
+      // 显示切片小游戏
+      elements.cuttingGame.classList.remove('hidden');
+      showDialog('让我们把黄瓜切成超可爱的薄片吧！点击屏幕切割黄瓜。');
+    }
+    
+    // 开始切片
+    function startCutting() {
+      elements.cuttingKnife.classList.remove('hidden');
+      elements.startCuttingBtn.disabled = true;
+      
+      // 模拟滑动切割
+      let sliceCount = 0;
+      const maxSlices = 5;
+      
+      const cuttingInterval = setInterval(() => {
+        sliceCount++;
+        elements.cuttingKnife.style.transform = `translateX(${(Math.random() * 80 + 10)}%) translateY(-12px)`;
+        
+        if (sliceCount >= maxSlices) {
+          clearInterval(cuttingInterval);
+          elements.cuttingKnife.classList.add('hidden');
+          elements.cuttingGame.classList.add('hidden');
+          
+          // 完成切片
+          gameState.hasCucumber = true;
+          gameState.cucumberSlices = maxSlices;
+          
+          // 显示黄瓜片
+          elements.cucumberLayer.classList.remove('hidden');
+          
+          for (let i = 0; i < maxSlices; i++) {
+            const cucumberSlice = document.createElement('div');
+            cucumberSlice.className = 'w-10 h-4 shadow-sm rounded-md bg-cucumber/80';
+            cucumberSlice.innerHTML = '<div class="w-full h-full bg-white/20 rounded-md"></div>';
+            elements.cucumberLayer.appendChild(cucumberSlice);
+          }
+          
+          showDialog('切得超棒！现在让我们涂抹酸奶油吧~');
+          highlightSelectedIngredients();
+        }
+      }, 500);
+    }
+    
+    // 涂抹酸奶油
+    function spreadCream() {
+      if (!gameState.hasCucumber) {
+        showDialog('要先准备好黄瓜才行哦！');
+        return;
+      }
+      
+      if (gameState.hasCream) {
+        showDialog('酸奶油已经涂抹好啦！');
+        return;
+      }
+      
+      // 显示涂抹小游戏
+      elements.spreadingGame.classList.remove('hidden');
+      showDialog('现在，把酸奶油涂得超均匀吧！');
+    }
+    
+    // 向左涂抹
+    function spreadCreamLeft() {
+      if (gameState.creamSpread > 0) {
+        gameState.creamSpread--;
+        elements.creamSpread.style.height = `${gameState.creamSpread * 20}%`;
+      }
+    }
+    
+    // 向右涂抹
+    function spreadCreamRight() {
+      if (gameState.creamSpread < 5) {
+        gameState.creamSpread++;
+        elements.creamSpread.style.height = `${gameState.creamSpread * 20}%`;
+      }
+    }
+    
+    // 完成涂抹
+    function finishSpreading() {
+      elements.spreadingGame.classList.add('hidden');
+      
+      // 完成涂抹
+      gameState.hasCream = true;
+      
+      // 显示酸奶油层
+      elements.creamLayer.classList.remove('hidden');
+      
+      showDialog('哇~涂得好均匀！现在让我们摆放黄瓜片吧。');
+      highlightSelectedIngredients();
+      
+      // 显示摆放小游戏
+      setTimeout(() => {
+        elements.arrangingGame.classList.remove('hidden');
+        
+        // 创建可拖动的黄瓜片
+        elements.arrangingArea.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+          const cucumberPiece = document.createElement('div');
+          cucumberPiece.className = 'absolute w-8 h-4 shadow-sm cursor-move bg-cucumber/80 rounded-md';
+          cucumberPiece.innerHTML = '<div class="w-full h-full bg-white/20 rounded-md"></div>';
+          cucumberPiece.style.left = `${Math.random() * 80 + 10}%`;
+          cucumberPiece.style.top = `${Math.random() * 80 + 10}%`;
+          cucumberPiece.style.transform = `translate(-50%, -50%)`;
+          cucumberPiece.dataset.id = i;
+          
+          // 添加拖动功能
+          makeDraggable(cucumberPiece);
+          
+          elements.arrangingArea.appendChild(cucumberPiece);
+        }
+      }, 1000);
+    }
+    
+    // 使元素可拖动
+    function makeDraggable(element) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      
+      element.onmousedown = dragMouseDown;
+      
+      function dragMouseDown(e) {
+        e.preventDefault();
+        // 获取鼠标位置
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+      
+      function elementDrag(e) {
+        e.preventDefault();
+        // 计算新位置
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        // 设置新位置
+        const newX = element.offsetLeft - pos1;
+        const newY = element.offsetTop - pos2;
+        
+        // 限制在容器内
+        const container = elements.arrangingArea;
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        
+        if (newX > 0 && newX < containerRect.width - elementRect.width) {
+          element.style.left = `${newX}px`;
+        }
+        
+        if (newY > 0 && newY < containerRect.height - elementRect.height) {
+          element.style.top = `${newY}px`;
+        }
+      }
+      
+      function closeDragElement() {
+        // 停止移动
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+    
+    // 完成摆放
+    function finishArranging() {
+      elements.arrangingGame.classList.add('hidden');
+      
+      // 完成摆放
+      gameState.cucumberArranged = true;
+      
+      showDialog('完美的星星图案！最后，添加一些美味的调味料吧~');
+      highlightSelectedIngredients();
+    }
+    
+    // 添加调味料
+    function addSpice(type) {
+      if (!gameState.cucumberArranged) {
+        showDialog('要先完成黄瓜片的摆放哦！');
+        return;
+      }
+      
+      if (gameState.spicesAdded >= 2) {
+        showDialog('已经添加了足够的调味料啦！');
+        return;
+      }
+      
+      gameState.spicesAdded++;
+      
+      // 显示调味料
+      elements.spiceLayer.classList.remove('hidden');
+      
+      const spice = document.createElement('div');
+      spice.className = 'absolute w-4 h-4 rounded-full';
+      
+      if (type === 1) {
+        spice.style.backgroundColor = '#84E0C6'; // 莳萝绿色
+        spice.style.boxShadow = '0 0 8px rgba(132, 224, 198, 0.7)';
+        spice.innerHTML = '<img src="三明治图片\\莳萝.jpg" alt="流星莳萝" class="w-full h-full object-cover rounded-full">';
+      } else {
+        spice.style.backgroundColor = '#99D98C'; // 薄荷绿色
+        spice.style.boxShadow = '0 0 8px rgba(153, 217, 140, 0.7)';
+        spice.innerHTML = '<img src="三明治图片\\薄荷.jpg" alt="银河薄荷" class="w-full h-full object-cover rounded-full">';
+      }
+      
+      spice.style.left = `${Math.random() * 60 + 20}%`;
+      spice.style.top = `${Math.random() * 60 + 20}%`;
+      spice.style.transform = 'translate(-50%, -50%)';
+      spice.style.animation = 'float 3s ease-in-out infinite';
+      
+      elements.spiceLayer.appendChild(spice);
+      
+      // 更新兔球球对话
+      if (gameState.spicesAdded === 1) {
+        showDialog('香气飘出来啦！再添加一种调味料会更美味哦。');
+      } else {
+        showDialog('太棒了！三明治看起来超好吃，可以提交订单了~');
+        updateServeButton();
+      }
+    }
+    
+    // 更新提交按钮状态
+    function updateServeButton() {
+      if (gameState.selectedBread && gameState.hasCucumber && gameState.hasCream && 
+          gameState.cucumberArranged && gameState.spicesAdded >= 1) {
+        elements.serveBtn.disabled = false;
+      } else {
+        elements.serveBtn.disabled = true;
+      }
+    }
+    
+    // 高亮已选食材
+    function highlightSelectedIngredients() {
+      // 重置所有食材卡片样式
+      document.querySelectorAll('.ingredient-card').forEach(card => {
+        card.classList.remove('border-accent');
+        card.classList.add('border-transparent');
+      });
+      
+      // 高亮已选食材
+      if (gameState.selectedBread === 1) {
+        elements.bread1.classList.remove('border-transparent');
+        elements.bread1.classList.add('border-accent');
+      } else if (gameState.selectedBread === 2) {
+        elements.bread2.classList.remove('border-transparent');
+        elements.bread2.classList.add('border-accent');
+      }
+      
+      if (gameState.hasCucumber) {
+        elements.cucumber.classList.remove('border-transparent');
+        elements.cucumber.classList.add('border-accent');
+      }
+      
+      if (gameState.hasCream) {
+        elements.cream.classList.remove('border-transparent');
+        elements.cream.classList.add('border-accent');
+      }
+      
+      if (gameState.spicesAdded > 0) {
+        elements.spice1.classList.remove('border-transparent');
+        elements.spice1.classList.add('border-accent');
+      }
+      
+      if (gameState.spicesAdded > 1) {
+        elements.spice2.classList.remove('border-transparent');
+        elements.spice2.classList.add('border-accent');
+      }
+    }
+    
+    // 提交订单
+    function serveOrder() {
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
+      
+      // 计算评分
+      calculateScore();
+      
+      // 显示评分界面
+      gameState.currentScreen = 'score';
+      updateScreen();
+    }
+    
+    // 计算评分
+    function calculateScore() {
+      // 速度评分 (基于剩余时间)
+      const speedPoints = Math.min(5, Math.ceil(gameState.timer / 12));
+      
+      // 美观度评分 (基于游戏表现)
+      let beautyPoints = 3; // 基础分
+      
+      // 根据黄瓜切片均匀度增加分数
+      if (gameState.cucumberSlices >= 4) {
+        beautyPoints++;
+      }
+      
+      // 根据酸奶油涂抹均匀度增加分数
+      if (gameState.creamSpread >= 3 && gameState.creamSpread <= 4) {
+        beautyPoints++;
+      }
+      
+      // 根据调味料数量增加分数
+      if (gameState.spicesAdded >= 2) {
+        beautyPoints++;
+      }
+      
+      // 总分
+      const totalPoints = Math.min(5, Math.ceil((speedPoints + beautyPoints) / 2));
+      
+      // 更新游戏状态
+      gameState.score = {
+        speed: speedPoints,
+        beauty: beautyPoints,
+        total: totalPoints
+      };
+      
+      // 更新星回币
+      gameState.totalStars += totalPoints;
+    }
+    
+    // 更新评分显示
+    function updateScoreDisplay() {
+      elements.speedScore.textContent = `${gameState.score.speed}/5`;
+      elements.beautyScore.textContent = `${gameState.score.beauty}/5`;
+      elements.starsEarned.textContent = `+${gameState.score.total}`;
+      
+      // 更新星星显示
+      for (let i = 1; i <= 5; i++) {
+        const starElement = document.getElementById(`star-${i}`);
+        if (i <= gameState.score.total) {
+          starElement.classList.remove('fa-star-o');
+          starElement.classList.add('fa-star', 'text-yellow-400');
+        } else {
+          starElement.classList.remove('fa-star');
+          starElement.classList.add('fa-star-o', 'text-yellow-400');
+        }
+      }
+    }
+    
+    // 显示兔球球对话
+    function showDialog(text) {
+      elements.shenDialog.innerHTML = `<p>${text}</p>`;
+      
+      // 添加打字效果
+      const originalText = text;
+      elements.shenDialog.textContent = '';
+      
+      let i = 0;
+      const typingInterval = setInterval(() => {
+        if (i < originalText.length) {
+          elements.shenDialog.textContent += originalText.charAt(i);
+          i++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, 40);
+    }
+    
+    // 初始化游戏
+    document.addEventListener('DOMContentLoaded', initGame);
+  </script>
+</body>
+</html>

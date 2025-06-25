@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兔球球的小窝</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9D4EDD', // 深紫色
+                        secondary: '#C77DFF', // 中紫色
+                        accent: '#E0AAFF', // 浅紫色
+                        neutral: '#FFF8E7', // 奶油白
+                        dark: '#240046', // 暗紫色背景
+                        star: '#F5F5DC', // 星光色
+                    },
+                    fontFamily: {
+                        cute: ['"Comic Sans MS"', '"Marker Felt"', 'Arial', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'twinkle': 'twinkle 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(255, 255, 255, 0.5)' },
+                            '100%': { boxShadow: '0 0 20px rgba(255, 255, 255, 0.8)' },
+                        },
+                        twinkle: {
+                            '0%, 100%': { opacity: 0.3 },
+                            '50%': { opacity: 1 },
+                        }
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            .text-shadow-glow {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            }
+            .rabbit-ear {
+                position: relative;
+                display: inline-block;
+            }
+            .rabbit-ear::before, .rabbit-ear::after {
+                content: '';
+                position: absolute;
+                top: -15px;
+                width: 15px;
+                height: 30px;
+                background-color: #C77DFF;
+                border-radius: 50% 50% 0 0;
+                transform-origin: bottom center;
+            }
+            .rabbit-ear::before {
+                left: -15px;
+                transform: rotate(-30deg);
+            }
+            .rabbit-ear::after {
+                right: -15px;
+                transform: rotate(30deg);
+            }
+            .btn-cute {
+                @apply bg-primary hover:bg-accent text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg animate-glow;
+            }
+            .btn-food {
+                @apply bg-neutral hover:bg-primary text-secondary font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-110 shadow-md hover:shadow-lg animate-glow;
+            }
+            .progress-container {
+                @apply w-full bg-gray-200 rounded-full h-4 overflow-hidden;
+            }
+            .progress-bar {
+                @apply h-full rounded-full transition-all duration-1000 ease-out;
+            }
+            .star {
+                @apply absolute rounded-full bg-star animate-twinkle;
+            }
+            .dialog-bubble {
+                @apply relative bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg max-w-xs;
+            }
+            .dialog-bubble::after {
+                content: '';
+                position: absolute;
+                bottom: 100%;
+                width: 0;
+                height: 0;
+                border: 8px solid transparent;
+            }
+            .dialog-left::after {
+                left: 20%;
+                border-bottom-color: white;
+            }
+            .dialog-right::after {
+                right: 20%;
+                border-bottom-color: white;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-dark to-primary/50 min-h-screen font-cute relative overflow-hidden">
+    <!-- 星空背景 -->
+    <div id="stars" class="absolute inset-0 z-0"></div>
+    
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 bg-primary/30 backdrop-blur-md shadow-sm py-4 px-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="rabbit-ear bg-secondary w-10 h-10 rounded-full flex items-center justify-center mr-3 shadow-md">
+                    <i class="fa fa-paw text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white text-shadow-glow">兔球球的小窝</h1>
+            </div>
+            <nav class="flex items-center">
+                <a href="主页.html" class="text-white hover:text-secondary transition-colors duration-300 mr-6">回主页</a>
+                <ul class="flex space-x-6">
+                    <li><a href="#home" class="text-white hover:text-secondary transition-colors duration-300">首页</a></li>
+                    <li><a href="#feed" class="text-white hover:text-secondary transition-colors duration-300">喂食</a></li>
+                    <li><a href="#play" class="text-white hover:text-secondary transition-colors duration-300">玩耍</a></li>
+                    <li><a href="#clean" class="text-white hover:text-secondary transition-colors duration-300">清洁</a></li>
+                    <li><a href="#record" class="text-white hover:text-secondary transition-colors duration-300">成长记录</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8 relative z-10">
+        <!-- 首页 -->
+        <section id="home" class="min-h-[80vh] flex flex-col items-center justify-center relative">
+            <!-- 兔球球 -->
+            <div class="relative z-10 flex flex-col items-center">
+                <div id="rabbit" class="w-48 h-48 bg-secondary rounded-full shadow-xl flex items-center justify-center mb-8 animate-float">
+                    <div class="text-white text-7xl">🐰</div>
+                </div>
+                
+                <!-- 沈星回对话框 -->
+                <div id="shenxinghui-dialog" class="hidden dialog-bubble dialog-right absolute -top-24 right-[-120px]">
+                    <div class="text-xs text-gray-500 mb-1">沈星回</div>
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+                
+                <!-- 兔球球对话框 -->
+                <div id="rabbit-dialog" class="hidden dialog-bubble dialog-left absolute -top-24 left-[-120px]">
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+                
+                <!-- 状态显示 -->
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-6 w-64 mb-8 border border-white/30">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-white font-bold">健康度</span>
+                        <span id="health-value" class="text-secondary font-bold">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="health-bar" class="progress-bar bg-secondary" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-4 mb-2">
+                        <span class="text-white font-bold">亲密度</span>
+                        <span id="love-value" class="text-secondary font-bold">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="love-bar" class="progress-bar bg-secondary" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- 功能按钮 -->
+                <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+                    <a href="#feed" class="btn-cute flex items-center justify-center">
+                        <i class="fa fa-cutlery mr-2"></i> 喂食
+                    </a>
+                    <a href="#play" class="btn-cute flex items-center justify-center">
+                        <i class="fa fa-gamepad mr-2"></i> 玩耍
+                    </a>
+                    <a href="#clean" class="btn-cute flex items-center justify-center">
+                        <i class="fa fa-shower mr-2"></i> 清洁
+                    </a>
+                    <a href="#record" class="btn-cute flex items-center justify-center">
+                        <i class="fa fa-book mr-2"></i> 成长记录
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 喂食页面 -->
+        <section id="feed" class="min-h-[80vh] flex flex-col items-center justify-center py-16 relative">
+            <h2 class="text-3xl font-bold text-white text-shadow-glow mb-12 text-center">给兔球球喂食</h2>
+            
+            <div class="relative">
+                <div id="rabbit-feed" class="w-48 h-48 bg-secondary rounded-full shadow-xl flex items-center justify-center mb-8 animate-float">
+                    <div class="text-white text-7xl">🐰</div>
+                </div>
+                
+                <!-- 兔球球对话框 -->
+                <div id="feed-message" class="hidden dialog-bubble dialog-left absolute -top-24 left-[-120px]">
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+                
+                <!-- 沈星回对话框 -->
+                <div id="shenxinghui-feed" class="hidden dialog-bubble dialog-right absolute -top-24 right-[-120px]">
+                    <div class="text-xs text-gray-500 mb-1">沈星回</div>
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full max-w-2xl mt-8">
+                <button class="btn-food" data-food="carrot">
+                    <div class="text-3xl mb-2">🥕</div>
+                    <p class="text-sm">星光胡萝卜</p>
+                </button>
+                <button class="btn-food" data-food="apple">
+                    <div class="text-3xl mb-2">🍎</div>
+                    <p class="text-sm">星云苹果</p>
+                </button>
+                <button class="btn-food" data-food="grass">
+                    <div class="text-3xl mb-2">🌿</div>
+                    <p class="text-sm">星河青草</p>
+                </button>
+                <button class="btn-food" data-food="grain">
+                    <div class="text-3xl mb-2">🌾</div>
+                    <p class="text-sm">星尘兔粮</p>
+                </button>
+            </div>
+            
+            <button id="back-home" class="btn-cute mt-12 flex items-center justify-center">
+                <i class="fa fa-home mr-2"></i> 返回首页
+            </button>
+        </section>
+
+        <!-- 玩耍页面 -->
+        <section id="play" class="min-h-[80vh] flex flex-col items-center justify-center py-16 relative">
+            <h2 class="text-3xl font-bold text-white text-shadow-glow mb-12 text-center">和兔球球玩耍</h2>
+            
+            <div class="relative">
+                <div id="rabbit-play" class="w-48 h-48 bg-secondary rounded-full shadow-xl flex items-center justify-center mb-8 animate-float">
+                    <div class="text-white text-7xl">🐰</div>
+                </div>
+                
+                <!-- 兔球球对话框 -->
+                <div id="play-message" class="hidden dialog-bubble dialog-left absolute -top-24 left-[-120px]">
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+                
+                <!-- 沈星回对话框 -->
+                <div id="shenxinghui-play" class="hidden dialog-bubble dialog-right absolute -top-24 right-[-120px]">
+                    <div class="text-xs text-gray-500 mb-1">沈星回</div>
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full max-w-xl mt-8">
+                <button class="btn-food" data-toy="ball">
+                    <div class="text-3xl mb-2">🎾</div>
+                    <p class="text-sm">星光小球</p>
+                </button>
+                <button class="btn-food" data-toy="carrot">
+                    <div class="text-3xl mb-2">🥕</div>
+                    <p class="text-sm">星际胡萝卜</p>
+                </button>
+                <button class="btn-food" data-toy="tunnel">
+                    <div class="text-3xl mb-2">🚇</div>
+                    <p class="text-sm">星轨隧道</p>
+                </button>
+            </div>
+            
+            <button id="back-home-play" class="btn-cute mt-12 flex items-center justify-center">
+                <i class="fa fa-home mr-2"></i> 返回首页
+            </button>
+        </section>
+
+        <!-- 清洁页面 -->
+        <section id="clean" class="min-h-[80vh] flex flex-col items-center justify-center py-16 relative">
+            <h2 class="text-3xl font-bold text-white text-shadow-glow mb-12 text-center">给兔球球清洁</h2>
+            
+            <div class="relative">
+                <div id="rabbit-clean" class="w-48 h-48 bg-secondary rounded-full shadow-xl flex items-center justify-center mb-8 animate-float">
+                    <div class="text-white text-7xl">🐰</div>
+                </div>
+                
+                <!-- 兔球球对话框 -->
+                <div id="clean-message" class="hidden dialog-bubble dialog-left absolute -top-24 left-[-120px]">
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+                
+                <!-- 沈星回对话框 -->
+                <div id="shenxinghui-clean" class="hidden dialog-bubble dialog-right absolute -top-24 right-[-120px]">
+                    <div class="text-xs text-gray-500 mb-1">沈星回</div>
+                    <p class="text-dark font-bold text-sm"></p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 w-full max-w-md mt-8">
+                <button class="btn-food" data-clean="brush">
+                    <div class="text-3xl mb-2">🪥</div>
+                    <p class="text-sm">星云梳毛器</p>
+                </button>
+                <button class="btn-food" data-clean="bath">
+                    <div class="text-3xl mb-2">🛁</div>
+                    <p class="text-sm">星雨沐浴露</p>
+                </button>
+            </div>
+            
+            <button id="back-home-clean" class="btn-cute mt-12 flex items-center justify-center">
+                <i class="fa fa-home mr-2"></i> 返回首页
+            </button>
+        </section>
+
+        <!-- 成长记录 -->
+        <section id="record" class="min-h-[80vh] py-16 relative">
+            <h2 class="text-3xl font-bold text-white text-shadow-glow mb-12 text-center">兔球球的成长记录</h2>
+            
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-6 max-w-3xl mx-auto border border-white/20">
+                <h3 class="text-xl font-bold text-white mb-6">成长趋势</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-white">健康度趋势</span>
+                            <span id="health-trend-value" class="font-bold text-secondary">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+                            <div id="health-trend-bar" class="h-full rounded-full bg-secondary" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-white">亲密度趋势</span>
+                            <span id="love-trend-value" class="font-bold text-secondary">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+                            <div id="love-trend-bar" class="h-full rounded-full bg-secondary" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-white">活跃度趋势</span>
+                            <span id="activity-trend-value" class="font-bold text-secondary">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+                            <div id="activity-trend-bar" class="h-full rounded-full bg-secondary" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <p class="text-white font-bold mb-2">本周互动记录</p>
+                    <ul id="weekly-activities" class="space-y-2">
+                        <li class="text-gray-400">暂无互动记录</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button id="back-home-record" class="btn-cute mt-12 mx-auto block">
+                <i class="fa fa-home mr-2"></i> 返回首页
+            </button>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-primary/20 text-white py-6 mt-12 relative z-10">
+        <div class="container mx-auto px-6 text-center">
+            <p>© 2025 兔球球的小窝 | 一个可爱的养宠小游戏</p>
+            <p class="mt-2 text-sm">愿你和兔球球度过美好的每一天 ❤️</p>
+        </div>
+    </footer>
+
+    <script>
+        // 创建星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const count = 300;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // 随机位置
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // 随机大小
+                const size = Math.random() * 3 + 1;
+                
+                // 随机延迟
+                const delay = Math.random() * 5;
+                
+                // 随机动画持续时间
+                const duration = Math.random() * 5 + 5;
+                
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                star.style.animationDuration = `${duration}s`;
+                
+                starsContainer.appendChild(star);
+            }
+            
+            // 添加一些大星星
+            for (let i = 0; i < 20; i++) {
+                const bigStar = document.createElement('div');
+                bigStar.className = 'star bg-accent';
+                
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 5 + 3;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 7 + 7;
+                
+                bigStar.style.left = `${x}%`;
+                bigStar.style.top = `${y}%`;
+                bigStar.style.width = `${size}px`;
+                bigStar.style.height = `${size}px`;
+                bigStar.style.animationDelay = `${delay}s`;
+                bigStar.style.animationDuration = `${duration}s`;
+                
+                starsContainer.appendChild(bigStar);
+            }
+        }
+
+        // 沈星回随机对话
+        const shenxinghuiDialogs = [
+            "兔球球今天吃得真开心呢",
+            "今天兔球球状态看起来很好，记得带它晒太阳",
+            "我在乌鲁鲁星上找到了一种新的星际食物，要不要试试？",
+            "兔球球的毛摸起来越来越柔软了",
+            "看！那片星云的形状像不像胡萝卜？",
+            "星际旅行的时候记得带上兔球球的食物哦",
+            "兔球球的蹦跳能力越来越强了，说不定能跳到月球上去",
+            "用星尘梳理毛发会让兔球球更加闪亮",
+            "听说在仙女座星系有一个兔子乐园",
+            "别忘了给兔球球的小窝装饰上流星碎片",
+            "兔球球的眼睛像两颗明亮的星星",
+            "在宇宙中，每只兔子都有自己独特的星轨",
+            "小心哦，别让兔球球被流星雨吓到",
+            "给兔球球听星际民谣会让它更加放松",
+            "我刚刚发明了一种用月光制作的兔粮，要不要试试看？"
+        ];
+
+        // 显示沈星回对话
+        function showShenxinghuiDialog(containerId) {
+            const container = document.getElementById(containerId);
+            const dialogText = container.querySelector('p');
+            
+            // 随机选择一条对话
+            const randomIndex = Math.floor(Math.random() * shenxinghuiDialogs.length);
+            dialogText.textContent = shenxinghuiDialogs[randomIndex];
+            
+            // 显示对话框
+            container.classList.remove('hidden');
+            
+            // 一段时间后隐藏
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 4000);
+        }
+
+        // 显示兔球球对话
+        function showRabbitDialog(containerId, message) {
+            const container = document.getElementById(containerId);
+            const dialogText = container.querySelector('p');
+            
+            dialogText.textContent = message;
+            
+            // 显示对话框
+            container.classList.remove('hidden');
+            
+            // 一段时间后隐藏
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 2000);
+        }
+
+        // 宠物状态
+        const petState = {
+            health: 0,
+            love: 0,
+            activity: 0,
+            lastFed: new Date().toISOString().split('T')[0],
+            weeklyInteractions: [],
+            lastReset: new Date().toISOString().split('T')[0] // 记录上次重置的日期
+        };
+
+        // 检查是否需要重置每周数据
+        function checkWeeklyReset() {
+            const today = new Date();
+            const lastResetDate = new Date(petState.lastReset);
+            
+            // 计算两个日期之间的天数差
+            const timeDiff = today.getTime() - lastResetDate.getTime();
+            const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+            
+            // 如果超过7天，重置数据
+            if (daysDiff >= 7) {
+                petState.health = 0;
+                petState.love = 0;
+                petState.activity = 0;
+                petState.weeklyInteractions = [];
+                petState.lastReset = today.toISOString().split('T')[0];
+                updatePetStatus();
+                updateWeeklyActivities();
+            }
+        }
+
+        // 更新宠物状态显示
+        function updatePetStatus() {
+            document.getElementById('health-value').textContent = `${petState.health}%`;
+            document.getElementById('health-bar').style.width = `${petState.health}%`;
+            document.getElementById('love-value').textContent = `${petState.love}%`;
+            document.getElementById('love-bar').style.width = `${petState.love}%`;
+            
+            // 更新成长记录中的趋势
+            document.getElementById('health-trend-value').textContent = `${petState.health}%`;
+            document.getElementById('health-trend-bar').style.width = `${petState.health}%`;
+            document.getElementById('love-trend-value').textContent = `${petState.love}%`;
+            document.getElementById('love-trend-bar').style.width = `${petState.love}%`;
+            document.getElementById('activity-trend-value').textContent = `${petState.activity}%`;
+            document.getElementById('activity-trend-bar').style.width = `${petState.activity}%`;
+        }
+
+        // 更新本周互动记录
+        function updateWeeklyActivities() {
+            const container = document.getElementById('weekly-activities');
+            container.innerHTML = '';
+            
+            if (petState.weeklyInteractions.length === 0) {
+                container.innerHTML = '<li class="text-gray-400">暂无互动记录</li>';
+                return;
+            }
+            
+            petState.weeklyInteractions.forEach((interaction, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-2 bg-white/5 rounded-lg';
+                
+                let actionText = '';
+                if (interaction.type === 'feed') {
+                    actionText = `喂食了${getFoodName(interaction.item)}`;
+                } else if (interaction.type === 'play') {
+                    actionText = `和兔球球玩${getToyName(interaction.item)}`;
+                } else if (interaction.type === 'clean') {
+                    actionText = `给兔球球${getCleanName(interaction.item)}`;
+                }
+                
+                li.innerHTML = `
+                    <span class="text-white">${actionText}</span>
+                    <span class="text-xs text-gray-400">${formatDate(interaction.date)}</span>
+                `;
+                
+                container.appendChild(li);
+            });
+        }
+
+        // 获取食物名称
+        function getFoodName(food) {
+            const names = {
+                'carrot': '星光胡萝卜',
+                'apple': '星云苹果',
+                'grass': '星河青草',
+                'grain': '星尘兔粮'
+            };
+            return names[food] || food;
+        }
+
+        // 获取玩具名称
+        function getToyName(toy) {
+            const names = {
+                'ball': '星光小球',
+                'carrot': '星际胡萝卜',
+                'tunnel': '星轨隧道'
+            };
+            return names[toy] || toy;
+        }
+
+        // 获取清洁名称
+        function getCleanName(clean) {
+            const names = {
+                'brush': '星云梳毛器',
+                'bath': '星雨沐浴露'
+            };
+            return names[clean] || clean;
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return `${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+
+        // 喂食功能
+        function setupFeeding() {
+            const foodButtons = document.querySelectorAll('[data-food]');
+            const rabbitFeed = document.getElementById('rabbit-feed');
+            
+            foodButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    checkWeeklyReset();
+                    
+                    const food = button.dataset.food;
+                    
+                    // 显示兔球球对话
+                    showRabbitDialog('feed-message', `谢谢，兔球球喜欢${getFoodName(food)}！`);
+                    
+                    // 显示沈星回对话
+                    showShenxinghuiDialog('shenxinghui-feed');
+                    
+                    // 改变兔子表情
+                    rabbitFeed.innerHTML = `<div class="text-white text-7xl">😋</div>`;
+                    
+                    // 一段时间后恢复
+                    setTimeout(() => {
+                        rabbitFeed.innerHTML = `<div class="text-white text-7xl">🐰</div>`;
+                        
+                        // 更新健康值
+                        petState.health = Math.min(100, petState.health + 10);
+                        petState.activity = Math.min(100, petState.activity + 5);
+                        updatePetStatus();
+                        
+                        // 记录互动
+                        const today = new Date().toISOString().split('T')[0];
+                        petState.weeklyInteractions.push({
+                            type: 'feed',
+                            item: food,
+                            date: today
+                        });
+                        
+                        // 更新互动记录
+                        updateWeeklyActivities();
+                    }, 2000);
+                });
+            });
+        }
+
+        // 玩耍功能
+        function setupPlaying() {
+            const toyButtons = document.querySelectorAll('[data-toy]');
+            const rabbitPlay = document.getElementById('rabbit-play');
+            
+            toyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    checkWeeklyReset();
+                    
+                    const toy = button.dataset.toy;
+                    
+                    // 显示兔球球对话
+                    showRabbitDialog('play-message', `和兔球球玩${getToyName(toy)}真开心！`);
+                    
+                    // 显示沈星回对话
+                    showShenxinghuiDialog('shenxinghui-play');
+                    
+                    // 改变兔子表情和添加动画
+                    rabbitPlay.innerHTML = `<div class="text-white text-7xl animate-wiggle">🥰</div>`;
+                    
+                    // 一段时间后恢复
+                    setTimeout(() => {
+                        rabbitPlay.innerHTML = `<div class="text-white text-7xl">🐰</div>`;
+                        
+                        // 更新亲密值
+                        petState.love = Math.min(100, petState.love + 10);
+                        petState.activity = Math.min(100, petState.activity + 7);
+                        updatePetStatus();
+                        
+                        // 记录互动
+                        const today = new Date().toISOString().split('T')[0];
+                        petState.weeklyInteractions.push({
+                            type: 'play',
+                            item: toy,
+                            date: today
+                        });
+                        
+                        // 更新互动记录
+                        updateWeeklyActivities();
+                    }, 2000);
+                });
+            });
+        }
+
+        // 清洁功能
+        function setupCleaning() {
+            const cleanButtons = document.querySelectorAll('[data-clean]');
+            const rabbitClean = document.getElementById('rabbit-clean');
+            
+            cleanButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    checkWeeklyReset();
+                    
+                    const clean = button.dataset.clean;
+                    
+                    // 显示兔球球对话
+                    showRabbitDialog('clean-message', `谢谢帮我${getCleanName(clean)}！`);
+                    
+                    // 显示沈星回对话
+                    showShenxinghuiDialog('shenxinghui-clean');
+                    
+                    // 改变兔子表情
+                    rabbitClean.innerHTML = `<div class="text-white text-7xl">😊</div>`;
+                    
+                    // 一段时间后恢复
+                    setTimeout(() => {
+                        rabbitClean.innerHTML = `<div class="text-white text-7xl">🐰</div>`;
+                        
+                        // 更新健康值
+                        petState.health = Math.min(100, petState.health + 10);
+                        petState.activity = Math.min(100, petState.activity + 3);
+                        updatePetStatus();
+                        
+                        // 记录互动
+                        const today = new Date().toISOString().split('T')[0];
+                        petState.weeklyInteractions.push({
+                            type: 'clean',
+                            item: clean,
+                            date: today
+                        });
+                        
+                        // 更新互动记录
+                        updateWeeklyActivities();
+                    }, 2000);
+                });
+            });
+        }
+
+        // 返回首页按钮
+        function setupBackButtons() {
+            document.getElementById('back-home').addEventListener('click', () => {
+                window.location.hash = 'home';
+            });
+            
+            document.getElementById('back-home-play').addEventListener('click', () => {
+                window.location.hash = 'home';
+            });
+            
+            document.getElementById('back-home-clean').addEventListener('click', () => {
+                window.location.hash = 'home';
+            });
+            
+            document.getElementById('back-home-record').addEventListener('click', () => {
+                window.location.hash = 'home';
+            });
+        }
+
+        // 平滑滚动
+        function setupSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // 更新URL但不触发滚动
+                        history.pushState(null, null, targetId);
+                    }
+                });
+            });
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            checkWeeklyReset();
+            updatePetStatus();
+            updateWeeklyActivities();
+            setupFeeding();
+            setupPlaying();
+            setupCleaning();
+            setupBackButtons();
+            setupSmoothScroll();
+            
+            // 根据URL的hash值显示相应的页面
+            if (window.location.hash) {
+                const targetId = window.location.hash;
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'auto'
+                        });
+                    }, 100);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

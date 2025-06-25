@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星舰巡航：星尘救援</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F9EFD',
+                        secondary: '#38BDF8',
+                        accent: '#818CF8',
+                        dreamPurple: '#9D4EDD',
+                        dark: '#0F172A',
+                        light: '#F1F5F9',
+                    },
+                    fontFamily: {
+                        space: ['Space Grotesk', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 0 8px rgba(79, 158, 253, 0.6);
+            }
+            .glow {
+                filter: drop-shadow(0 0 8px rgba(79, 158, 255, 0.8));
+            }
+            .star-trail {
+                position: absolute;
+                background: rgba(255, 255, 255, 0.6);
+                border-radius: 50%;
+                animation: trail 3s linear forwards;
+            }
+            .parallax-bg {
+                background-image: 
+                    radial-gradient(circle at 10% 20%, rgba(129, 140, 248, 0.2) 0%, transparent 20%),
+                    radial-gradient(circle at 80% 70%, rgba(79, 158, 253, 0.2) 0%, transparent 20%);
+            }
+        }
+
+        @keyframes trail {
+            0% { transform: translateY(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        @keyframes bg-scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 -2000px; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-light font-space overflow-hidden h-screen w-full">
+    <!-- 游戏容器 -->
+    <div id="game-container" class="relative h-screen w-full overflow-hidden">
+        <!-- 背景星空 -->
+        <div id="starfield" class="absolute inset-0 parallax-bg" style="background-size: 1000px 2000px; animation: bg-scroll 60s linear infinite;"></div>
+        
+        <!-- 距离指示器 -->
+        <div id="distance-indicator" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-dark/50 px-4 py-2 rounded-full backdrop-blur-sm z-20 hidden">
+            <span id="distance-text">距离目的地: 100%</span>
+        </div>
+        
+        <!-- 游戏界面 -->
+        <div id="game-ui" class="absolute inset-0 flex flex-col items-center justify-between p-4 z-10">
+            <!-- 顶部信息 - 已添加回首页导航 -->
+            <div class="w-full flex justify-between items-center">
+                <div class="text-xl font-bold text-shadow">
+                    <span id="score-display">得分: 0</span>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="星轨观测.html" class="bg-dark/50 hover:bg-dark/80 text-light p-2 rounded-full transition-all flex items-center">
+                        <i class="fa fa-home mr-1"></i> 回首页
+                    </a>
+                    <button id="pause-btn" class="bg-dark/50 hover:bg-dark/80 text-light p-2 rounded-full transition-all">
+                        <i class="fa fa-pause"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 玩家飞船 -->
+            <div id="player" class="absolute w-16 h-16 z-20 cursor-pointer glow" style="bottom: 10%; left: 50%; transform: translateX(-50%);">
+                <svg viewBox="0 0 100 100" class="w-full h-full">
+                    <!-- 飞机机身 -->
+                    <path d="M50,10 L30,40 L20,60 L50,90 L80,60 L70,40 Z" fill="#4F9EFD" />
+                    
+                    <!-- 机翼 -->
+                    <path d="M20,40 L80,40" stroke="#38BDF8" stroke-width="10" stroke-linecap="round" />
+                    
+                    <!-- 尾翼 -->
+                    <path d="M50,10 L50,25" stroke="#38BDF8" stroke-width="8" stroke-linecap="round" />
+                    
+                    <!-- 驾驶舱 -->
+                    <circle cx="50" cy="35" r="8" fill="#38BDF8" />
+                    
+                    <!-- 发光尾焰 -->
+                    <path d="M50,90 L40,100 L60,100 Z" fill="none">
+                        <animate attributeName="fill" values="rgba(255,255,255,0);rgba(255,255,255,0.8);rgba(255,255,255,0)" dur="0.3s" repeatCount="indefinite" />
+                    </path>
+                </svg>
+            </div>
+            
+            <!-- 终点区域 -->
+            <div id="destination" class="absolute w-32 h-32 rounded-full bg-accent/30 backdrop-blur-sm flex items-center justify-center z-10" style="top: -50px; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.5s;">
+                <div class="w-24 h-24 rounded-full bg-accent/50 backdrop-blur-md flex items-center justify-center">
+                    <div class="w-16 h-16 rounded-full bg-accent/70 backdrop-blur-lg flex items-center justify-center">
+                        <span class="text-xs font-bold text-light animate-pulse">天秤座暗区</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 开始菜单 -->
+            <div id="start-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-dark/80 z-30">
+                <h1 class="text-[clamp(2rem,5vw,4rem)] font-bold mb-6 text-shadow animate-pulse">星舰巡航：星尘救援</h1>
+                <div class="text-lg mb-8 max-w-md text-center">
+                    <p class="mb-3 text-dreamPurple"><i class="fa fa-bolt"></i> "检测到暗物质风暴，需要你协助导航。——沈星回"</p>
+                    <p>点击并拖动星舰，向上飞行，躲避陨石，抵达天秤座暗区！</p>
+                </div>
+                <button id="start-btn" class="bg-primary hover:bg-primary/80 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 hover:shadow-lg flex items-center">
+                    <i class="fa fa-play mr-2"></i> 开始游戏
+                </button>
+            </div>
+            
+            <!-- 暂停菜单 -->
+            <div id="pause-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-dark/80 z-30 hidden">
+                <h2 class="text-3xl font-bold mb-8 text-shadow">游戏暂停</h2>
+                <div class="flex flex-col space-y-4 w-64">
+                    <button id="resume-btn" class="bg-primary hover:bg-primary/80 text-white font-bold py-3 px-6 rounded-full transition-all">
+                        <i class="fa fa-play mr-2"></i> 继续游戏
+                    </button>
+                    <button id="restart-btn" class="bg-secondary hover:bg-secondary/80 text-white font-bold py-3 px-6 rounded-full transition-all">
+                        <i class="fa fa-refresh mr-2"></i> 重新开始
+                    </button>
+                    <button id="exit-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full transition-all">
+                        <i class="fa fa-sign-out mr-2"></i> 退出游戏
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 游戏结束菜单 -->
+            <div id="game-over-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-dark/80 z-30 hidden">
+                <h2 id="game-over-title" class="text-3xl font-bold mb-4 text-shadow">任务失败</h2>
+                <p id="game-over-message" class="text-xl mb-6">"‘光猎协议’启动中…要重试吗？"</p>
+                <div class="text-xl mb-8">
+                    <p>最终得分: <span id="final-score">0</span></p>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="try-again-btn" class="bg-primary hover:bg-primary/80 text-white font-bold py-3 px-6 rounded-full transition-all">
+                        <i class="fa fa-refresh mr-2"></i> 再试一次
+                    </button>
+                    <button id="exit-game-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-full transition-all">
+                        <i class="fa fa-sign-out mr-2"></i> 退出游戏
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        const game = {
+            isRunning: false,
+            isPaused: false,
+            score: 0,
+            speed: 8,
+            asteroidTimer: null,
+            asteroidInterval: 1200,
+            starTimer: null,
+            starInterval: 200,
+            lastAsteroidTime: 0,
+            lastStarTime: 0,
+            soundEnabled: true, // 保留声音控制状态但移除界面
+            player: {
+                element: null,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                isDragging: false,
+                initialY: 0,
+                distanceToDestination: 100,
+                upwardTravelTime: 0,
+                lastPositionY: 0
+            },
+            destination: {
+                element: null,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                visible: false
+            },
+            gameContainer: null,
+            scoreDisplay: null,
+            soundToggle: null, // 保留引用但不渲染
+            startScreen: null,
+            pauseScreen: null,
+            gameOverScreen: null,
+            gameOverTitle: null,
+            gameOverMessage: null,
+            finalScore: null,
+            distanceIndicator: null,
+            distanceText: null,
+            sounds: {
+                bgm: null,
+                explosion: null,
+                success: null
+            }
+        };
+
+        // 初始化游戏
+        function initGame() {
+            // 获取DOM元素（不再获取声音按钮）
+            game.gameContainer = document.getElementById('game-container');
+            game.player.element = document.getElementById('player');
+            game.destination.element = document.getElementById('destination');
+            game.scoreDisplay = document.getElementById('score-display');
+            game.startScreen = document.getElementById('start-screen');
+            game.pauseScreen = document.getElementById('pause-screen');
+            game.gameOverScreen = document.getElementById('game-over-screen');
+            game.gameOverTitle = document.getElementById('game-over-title');
+            game.gameOverMessage = document.getElementById('game-over-message');
+            game.finalScore = document.getElementById('final-score');
+            game.distanceIndicator = document.getElementById('distance-indicator');
+            game.distanceText = document.getElementById('distance-text');
+
+            // 设置玩家飞船属性
+            const playerRect = game.player.element.getBoundingClientRect();
+            game.player.width = playerRect.width;
+            game.player.height = playerRect.height;
+            game.player.initialY = game.gameContainer.clientHeight - playerRect.height - 40;
+            game.player.y = game.player.initialY;
+            
+            // 设置终点区域属性
+            const destinationRect = game.destination.element.getBoundingClientRect();
+            game.destination.width = destinationRect.width;
+            game.destination.height = destinationRect.height;
+            game.destination.y = -50;
+            
+            // 初始化声音
+            initSounds();
+            
+            // 设置事件监听（移除声音按钮相关监听）
+            setupEventListeners();
+            
+            // 创建初始星星
+            createStars(30);
+        }
+
+        // 初始化声音
+        function initSounds() {
+            game.sounds.bgm = new Audio('data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+            game.sounds.explosion = new Audio('data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+            game.sounds.success = new Audio('data:audio/wav;base64,UklGRnQGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        }
+
+        // 设置事件监听（移除声音按钮相关监听）
+        function setupEventListeners() {
+            // 开始游戏按钮
+            document.getElementById('start-btn').addEventListener('click', function() {
+                startGame();
+            });
+            
+            // 暂停相关按钮
+            document.getElementById('pause-btn').addEventListener('click', togglePause);
+            document.getElementById('resume-btn').addEventListener('click', togglePause);
+            
+            // 重新开始按钮
+            document.getElementById('restart-btn').addEventListener('click', restartGame);
+            document.getElementById('try-again-btn').addEventListener('click', restartGame);
+            
+            // 退出按钮
+            document.getElementById('exit-btn').addEventListener('click', exitGame);
+            document.getElementById('exit-game-btn').addEventListener('click', exitGame);
+            
+            // 玩家飞船拖动
+            game.player.element.addEventListener('mousedown', startDrag);
+            game.player.element.addEventListener('touchstart', startDrag, { passive: false });
+            
+            document.addEventListener('mousemove', dragPlayer);
+            document.addEventListener('touchmove', dragPlayer, { passive: false });
+            
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            // 窗口大小改变时更新游戏元素位置
+            window.addEventListener('resize', updateGameElements);
+        }
+
+        // 开始游戏
+        function startGame() {
+            game.isRunning = true;
+            game.isPaused = false;
+            game.score = 0;
+            game.speed = 8;
+            game.asteroidInterval = 1200;
+            game.player.distanceToDestination = 100;
+            game.player.upwardTravelTime = 0;
+            game.player.lastPositionY = game.player.initialY;
+            game.destination.visible = false;
+            game.destination.element.style.opacity = '0';
+            
+            game.distanceIndicator.classList.remove('hidden');
+            
+            game.scoreDisplay.textContent = `得分: ${game.score}`;
+            game.distanceText.textContent = `距离目的地: ${game.player.distanceToDestination}%`;
+            game.startScreen.classList.add('hidden');
+            game.pauseScreen.classList.add('hidden');
+            game.gameOverScreen.classList.add('hidden');
+            
+            resetPlayerPosition();
+            
+            clearAsteroids();
+            
+            game.asteroidTimer = setInterval(createAsteroid, game.asteroidInterval);
+            
+            game.starTimer = setInterval(createStar, game.starInterval);
+            
+            if (game.soundEnabled) {
+                playSound(game.sounds.bgm, true);
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 暂停/恢复游戏
+        function togglePause() {
+            game.isPaused = !game.isPaused;
+            
+            if (game.isPaused) {
+                game.pauseScreen.classList.remove('hidden');
+                game.sounds.bgm.pause();
+            } else {
+                game.pauseScreen.classList.add('hidden');
+                requestAnimationFrame(gameLoop);
+                if (game.soundEnabled) {
+                    playSound(game.sounds.bgm, true);
+                }
+            }
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            clearInterval(game.asteroidTimer);
+            clearInterval(game.starTimer);
+            
+            game.isRunning = false;
+            game.isPaused = false;
+            
+            startGame();
+        }
+
+        // 退出游戏
+        function exitGame() {
+            clearInterval(game.asteroidTimer);
+            clearInterval(game.starTimer);
+            
+            game.isRunning = false;
+            game.isPaused = false;
+            
+            game.distanceIndicator.classList.add('hidden');
+            
+            game.startScreen.classList.remove('hidden');
+            game.pauseScreen.classList.add('hidden');
+            game.gameOverScreen.classList.add('hidden');
+            
+            game.sounds.bgm.pause();
+        }
+
+        // 开始拖动玩家飞船
+        function startDrag(e) {
+            if (!game.isRunning || game.isPaused) return;
+            
+            e.preventDefault();
+            game.player.isDragging = true;
+            
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            
+            const rect = game.player.element.getBoundingClientRect();
+            game.player.offsetX = clientX - rect.left;
+            game.player.offsetY = clientY - rect.top;
+        }
+
+        // 拖动玩家飞船
+        function dragPlayer(e) {
+            if (!game.player.isDragging || !game.isRunning || game.isPaused) return;
+            
+            e.preventDefault();
+            
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            
+            const containerRect = game.gameContainer.getBoundingClientRect();
+            let newX = clientX - containerRect.left - game.player.offsetX;
+            let newY = clientY - containerRect.top - game.player.offsetY;
+            
+            newX = Math.max(0, Math.min(containerRect.width - game.player.width, newX));
+            newY = Math.max(0, Math.min(containerRect.height - game.player.height, newY));
+            
+            game.player.element.style.left = `${newX}px`;
+            game.player.element.style.top = `${newY}px`;
+            
+            game.player.x = newX;
+            game.player.y = newY;
+        }
+
+        // 结束拖动
+        function endDrag() {
+            game.player.isDragging = false;
+        }
+
+        // 创建星星背景
+        function createStars(count) {
+            const starfield = document.getElementById('starfield');
+            starfield.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'absolute rounded-full';
+                
+                const size = Math.random() * 3 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const opacity = Math.random() * 0.8 + 0.2;
+                
+                const animationDuration = Math.random() * 3 + 2;
+                const animationDelay = Math.random() * 3;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.backgroundColor = 'white';
+                star.style.opacity = opacity;
+                star.style.animation = `pulse ${animationDuration}s infinite ${animationDelay}s`;
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // 创建单个流星
+        function createStar() {
+            if (!game.isRunning || game.isPaused) return;
+            
+            const starfield = document.getElementById('starfield');
+            const star = document.createElement('div');
+            star.className = 'star-trail';
+            
+            const size = Math.random() * 2 + 1;
+            const x = Math.random() * 100;
+            
+            star.style.width = `${size}px`;
+            star.style.height = `${size * 3}px`;
+            star.style.left = `${x}%`;
+            star.style.top = '-10px';
+            
+            starfield.appendChild(star);
+            
+            setTimeout(() => {
+                if (star && star.parentNode === starfield) {
+                    starfield.removeChild(star);
+                }
+            }, 3000);
+        }
+
+        // 创建陨石
+        function createAsteroid() {
+            if (!game.isRunning || game.isPaused) return;
+            
+            const containerRect = game.gameContainer.getBoundingClientRect();
+            const asteroid = document.createElement('div');
+            
+            const size = Math.random() * 40 + 20;
+            
+            const x = Math.random() * (containerRect.width - size);
+            
+            const isCircle = Math.random() > 0.5;
+            
+            if (isCircle) {
+                asteroid.style.width = `${size}px`;
+                asteroid.style.height = `${size}px`;
+                asteroid.style.borderRadius = '50%';
+                asteroid.style.backgroundColor = `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, 0.8)`;
+            } else {
+                asteroid.style.width = `${size}px`;
+                asteroid.style.height = `${size}px`;
+                asteroid.style.backgroundColor = 'transparent';
+                
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 100 100');
+                svg.setAttribute('width', '100%');
+                svg.setAttribute('height', '100%');
+                
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                
+                const points = [];
+                const pointCount = Math.floor(Math.random() * 4) + 3;
+                
+                for (let i = 0; i < pointCount; i++) {
+                    const angle = (i / pointCount) * Math.PI * 2;
+                    const radius = 50 * (0.7 + Math.random() * 0.3);
+                    const xCoord = 50 + radius * Math.cos(angle);
+                    const yCoord = 50 + radius * Math.sin(angle);
+                    points.push(`${xCoord},${yCoord}`);
+                }
+                
+                polygon.setAttribute('points', points.join(' '));
+                polygon.setAttribute('fill', `rgba(${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, ${Math.random() * 100 + 155}, 0.8)`);
+                
+                svg.appendChild(polygon);
+                asteroid.appendChild(svg);
+            }
+            
+            asteroid.className = 'asteroid absolute';
+            asteroid.style.top = '-50px';
+            asteroid.style.left = `${x}px`;
+            asteroid.style.transform = `rotate(${Math.random() * 360}deg)`;
+            
+            game.gameContainer.appendChild(asteroid);
+            
+            moveAsteroid(asteroid, size);
+        }
+
+        // 移动陨石
+        function moveAsteroid(asteroid, size) {
+            const containerRect = game.gameContainer.getBoundingClientRect();
+            const startY = -size;
+            const endY = containerRect.height;
+            
+            const baseSpeed = game.speed * (1 + Math.random() * 0.5);
+            const speed = baseSpeed;
+            
+            let currentY = startY;
+            const moveInterval = setInterval(() => {
+                if (!game.isRunning || game.isPaused) return;
+                
+                currentY += speed;
+                asteroid.style.top = `${currentY}px`;
+                
+                const currentRotation = parseFloat(asteroid.style.transform.replace('rotate(', '').replace('deg)', ''));
+                asteroid.style.transform = `rotate(${currentRotation + 2}deg)`;
+                
+                if (currentY > endY) {
+                    clearInterval(moveInterval);
+                    if (asteroid.parentNode === game.gameContainer) {
+                        game.gameContainer.removeChild(asteroid);
+                    }
+                } else {
+                    if (checkCollision(asteroid, game.player.element)) {
+                        clearInterval(moveInterval);
+                        gameOver(false);
+                    }
+                }
+            }, 16);
+        }
+
+        // 清除所有陨石
+        function clearAsteroids() {
+            const asteroids = document.querySelectorAll('.asteroid');
+            asteroids.forEach(asteroid => {
+                if (asteroid.parentNode === game.gameContainer) {
+                    game.gameContainer.removeChild(asteroid);
+                }
+            });
+        }
+
+        // 检查碰撞
+        function checkCollision(element1, element2) {
+            const rect1 = element1.getBoundingClientRect();
+            const rect2 = element2.getBoundingClientRect();
+            
+            return (
+                rect1.left < rect2.right &&
+                rect1.right > rect2.left &&
+                rect1.top < rect2.bottom &&
+                rect1.bottom > rect2.top
+            );
+        }
+
+        // 重置玩家位置
+        function resetPlayerPosition() {
+            const containerRect = game.gameContainer.getBoundingClientRect();
+            const x = containerRect.width / 2 - game.player.width / 2;
+            const y = game.player.initialY;
+            
+            game.player.element.style.left = `${x}px`;
+            game.player.element.style.top = `${y}px`;
+            
+            game.player.x = x;
+            game.player.y = y;
+            game.player.lastPositionY = y;
+        }
+
+        // 更新游戏元素位置
+        function updateGameElements() {
+            if (!game.isRunning) return;
+            
+            const containerRect = game.gameContainer.getBoundingClientRect();
+            
+            const relativeX = game.player.x / containerRect.width;
+            const relativeY = game.player.y / containerRect.height;
+            
+            const newX = relativeX * containerRect.width;
+            const newY = relativeY * containerRect.height;
+            
+            game.player.element.style.left = `${newX}px`;
+            game.player.element.style.top = `${newY}px`;
+            
+            const playerRect = game.player.element.getBoundingClientRect();
+            game.player.width = playerRect.width;
+            game.player.height = playerRect.height;
+            game.player.x = newX;
+            game.player.y = newY;
+            
+            game.destination.element.style.left = `${containerRect.width / 2 - game.destination.width / 2}px`;
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            if (!game.isRunning || game.isPaused) return;
+            
+            game.score += 1;
+            game.scoreDisplay.textContent = `得分: ${game.score}`;
+            
+            if (game.player.lastPositionY > game.player.y) {
+                const moveDistance = game.player.lastPositionY - game.player.y;
+                game.player.distanceToDestination = Math.max(0, game.player.distanceToDestination - moveDistance * 0.05);
+                game.player.upwardTravelTime += 1/60;
+                
+                game.distanceText.textContent = `距离目的地: ${Math.round(game.player.distanceToDestination)}%`;
+                
+                if (game.player.upwardTravelTime >= 5 && !game.destination.visible) {
+                    game.destination.visible = true;
+                    game.destination.element.style.opacity = '1';
+                }
+            }
+            
+            game.player.lastPositionY = game.player.y;
+            
+            if (game.score % 500 === 0) {
+                game.speed += 0.7;
+                game.asteroidInterval = Math.max(500, game.asteroidInterval - 100);
+                clearInterval(game.asteroidTimer);
+                game.asteroidTimer = setInterval(createAsteroid, game.asteroidInterval);
+            }
+            
+            if (game.destination.visible && checkCollision(game.player.element, game.destination.element)) {
+                gameOver(true);
+                return;
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 游戏结束
+        function gameOver(isSuccess) {
+            game.isRunning = false;
+            
+            clearInterval(game.asteroidTimer);
+            clearInterval(game.starTimer);
+            
+            game.distanceIndicator.classList.add('hidden');
+            
+            game.gameOverScreen.classList.remove('hidden');
+            
+            if (isSuccess) {
+                game.gameOverTitle.textContent = '任务成功';
+                game.gameOverMessage.textContent = '（沈星回点头："航道稳定…辛苦了。"）';
+                game.gameOverTitle.classList.add('text-secondary');
+                game.gameOverTitle.classList.remove('text-red-500');
+                
+                if (game.soundEnabled) {
+                    playSound(game.sounds.success);
+                }
+            } else {
+                game.gameOverTitle.textContent = '任务失败';
+                game.gameOverMessage.textContent = '"‘光猎协议’启动中…要重试吗？"';
+                game.gameOverTitle.classList.add('text-red-500');
+                game.gameOverTitle.classList.remove('text-secondary');
+                
+                createExplosion(game.player.x + game.player.width/2, game.player.y + game.player.height/2);
+                
+                if (game.soundEnabled) {
+                    playSound(game.sounds.explosion);
+                }
+            }
+            
+            game.finalScore.textContent = game.score;
+            
+            game.sounds.bgm.pause();
+        }
+
+        // 创建爆炸效果
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'absolute z-30';
+            
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 100 100');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                const size = Math.random() * 10 + 5;
+                const angle = (i / 15) * Math.PI * 2;
+                const distance = 50;
+                
+                particle.setAttribute('cx', '50');
+                particle.setAttribute('cy', '50');
+                particle.setAttribute('r', size);
+                particle.setAttribute('fill', `rgba(${255}, ${Math.random() * 100 + 155}, ${0}, 0.8)`);
+                
+                const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                animate.setAttribute('attributeName', 'cx');
+                animate.setAttribute('from', '50');
+                animate.setAttribute('to', `${50 + Math.cos(angle) * distance}`);
+                animate.setAttribute('dur', '0.8s');
+                animate.setAttribute('fill', 'freeze');
+                
+                const animate2 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                animate2.setAttribute('attributeName', 'cy');
+                animate2.setAttribute('from', '50');
+                animate2.setAttribute('to', `${50 + Math.sin(angle) * distance}`);
+                animate2.setAttribute('dur', '0.8s');
+                animate2.setAttribute('fill', 'freeze');
+                
+                const animate3 = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                animate3.setAttribute('attributeName', 'opacity');
+                animate3.setAttribute('from', '1');
+                animate3.setAttribute('to', '0');
+                animate3.setAttribute('dur', '0.8s');
+                animate3.setAttribute('fill', 'freeze');
+                
+                particle.appendChild(animate);
+                particle.appendChild(animate2);
+                particle.appendChild(animate3);
+                svg.appendChild(particle);
+                
+                animate.beginElement();
+                animate2.beginElement();
+                animate3.beginElement();
+            }
+            
+            explosion.appendChild(svg);
+            explosion.style.width = '100px';
+            explosion.style.height = '100px';
+            explosion.style.left = `${x - 50}px`;
+            explosion.style.top = `${y - 50}px`;
+            
+            game.gameContainer.appendChild(explosion);
+            
+            setTimeout(() => {
+                if (explosion.parentNode === game.gameContainer) {
+                    game.gameContainer.removeChild(explosion);
+                }
+            }, 800);
+        }
+
+        // 播放声音（虽然没有界面，但保留功能）
+        function playSound(sound, loop = false) {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.loop = loop;
+            sound.play().catch(e => {
+                console.log("播放声音失败:", e);
+            });
+        }
+
+        // 初始化游戏
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
+    
